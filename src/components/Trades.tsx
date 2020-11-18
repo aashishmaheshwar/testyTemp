@@ -18,9 +18,11 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 
 import { StyledTableCell, StyledTableRow } from "./../core/Table";
-import { Chip, FormLabel } from "@material-ui/core";
-import DoneIcon from '@material-ui/icons/Done';
+import Chip from "@material-ui/core/Chip";
+import DoneIcon from "@material-ui/icons/Done";
+import HelpIcon from "@material-ui/icons/Help";
 import InputLabel from "@material-ui/core/InputLabel/InputLabel";
+import Tooltip from "@material-ui/core/Tooltip";
 
 function createData(
   tradeId: string,
@@ -41,20 +43,22 @@ const useStyles = makeStyles({
     minWidth: 700,
   },
   root: {
-    display: 'flex',
-    justifyContent: 'center',
-    flexWrap: 'wrap',
-    listStyle: 'none',
-    padding: '5px',
+    display: "flex",
+    justifyContent: "center",
+    flexWrap: "wrap",
+    listStyle: "none",
+    padding: "5px",
     margin: 0,
-    marginTop: '8px'
+    marginTop: "8px",
   },
   chip: {
-    margin: '2px'
+    margin: "2px",
   },
   attributeLabel: {
-    paddingTop: '8px'
-  }
+    paddingTop: "8px",
+    display: "flex",
+    alignItems: "center",
+  },
 });
 
 const chipData = [
@@ -84,7 +88,7 @@ const Trades = () => {
 
   const handleDelete = (attr: string) => {
     // console.info('You clicked the delete icon.');
-    setSelectedAttrs(oldAttrs => {
+    setSelectedAttrs((oldAttrs) => {
       oldAttrs.delete(attr);
       return new Set([...Array.from(oldAttrs)]);
     });
@@ -92,11 +96,11 @@ const Trades = () => {
 
   const handleClick = (attr: string) => {
     // console.info('You clicked the Chip.');
-    if(selectedAttrs.has(attr)) {
+    if (selectedAttrs.has(attr)) {
       handleDelete(attr);
       return;
     }
-    setSelectedAttrs(oldAttrs => {
+    setSelectedAttrs((oldAttrs) => {
       return new Set([...Array.from(oldAttrs), attr]);
     });
   };
@@ -123,6 +127,7 @@ const Trades = () => {
               shrink: true,
             }}
             fullWidth
+            required
           />
           <TextField
             margin="dense"
@@ -131,12 +136,21 @@ const Trades = () => {
               shrink: true,
             }}
             fullWidth
+            required
           />
-          <InputLabel shrink={true} classes={
-            {
-              root: classes.attributeLabel
-            }
-          }>Trade Attributes</InputLabel>
+          <InputLabel
+            required
+            shrink={true}
+            classes={{
+              root: classes.attributeLabel,
+            }}
+          >
+            Trade Attributes&nbsp;
+            <Tooltip title="Select atleast one attribute">
+              <HelpIcon />
+            </Tooltip>
+            &nbsp;
+          </InputLabel>
           <Paper component="ul" className={classes.root} elevation={3}>
             {chipData.map((attribute, idx) => {
               return (
@@ -144,10 +158,17 @@ const Trades = () => {
                   <Chip
                     label={attribute}
                     clickable
+                    variant="outlined"
                     color={selectedAttrs.has(attribute) ? "primary" : undefined}
                     onClick={() => handleClick(attribute)}
-                    onDelete={selectedAttrs.has(attribute) ? () => handleDelete(attribute) : undefined}
-                    deleteIcon={selectedAttrs.has(attribute) ? <DoneIcon /> : undefined}
+                    onDelete={
+                      selectedAttrs.has(attribute)
+                        ? () => handleDelete(attribute)
+                        : undefined
+                    }
+                    deleteIcon={
+                      selectedAttrs.has(attribute) ? <DoneIcon /> : undefined
+                    }
                     className={classes.chip}
                   />
                 </li>
