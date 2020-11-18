@@ -1,37 +1,217 @@
-import { Box, Button } from '@material-ui/core';
-import React from 'react';
-import '../css/Trades.css';
+import Box from "@material-ui/core/Box";
+import React, { useState } from "react";
+import "../css/Trades.css";
 
-const Trades = () => {
-    return (
-        <>
-          <Box>
-              <Button color="primary">+ New Trade</Button>
-          </Box>  
-          <Box>
-              <table>
-                  <thead>
-                      <tr>
-                          <td>
-                              Trade ID
-                          </td>
-                          <td>Trade Model Name</td>
-                          <td>Trade Channel Name</td>
-                          <td>Show Trade Model</td>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <tr>
-                          <td>TM000027</td> 
-                          <td>XP Investimentos - Equity</td> 
-                          <td>XP Investimentos - Fix</td> 
-                          <td><Button color="primary">Show/Edit Trade Details</Button></td>
-                      </tr>
-                  </tbody>
-              </table>
-          </Box>
-        </>
-    )
+import { makeStyles } from "@material-ui/core/styles";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableContainer from "@material-ui/core/TableContainer";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import Paper from "@material-ui/core/Paper";
+import Button from "@material-ui/core/Button";
+import TextField from "@material-ui/core/TextField";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
+
+import { StyledTableCell, StyledTableRow } from "./../core/Table";
+import { Chip, FormLabel } from "@material-ui/core";
+import DoneIcon from '@material-ui/icons/Done';
+import InputLabel from "@material-ui/core/InputLabel/InputLabel";
+
+function createData(
+  tradeId: string,
+  tradeModelName: string,
+  tradeChannelName: string
+) {
+  return { tradeId, tradeModelName, tradeChannelName };
 }
 
-export default Trades
+const rows = [
+  createData("TM000027", "XP Investments - Equity", "XP Investments - Fix"),
+  createData("TM000028", "MP Investments - Equity", "MP Investments - Fix"),
+  createData("TM000030", "MLM Investments - Forex", "MLM Investments - Fix"),
+];
+
+const useStyles = makeStyles({
+  table: {
+    minWidth: 700,
+  },
+  root: {
+    display: 'flex',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    listStyle: 'none',
+    padding: '5px',
+    margin: 0,
+    marginTop: '8px'
+  },
+  chip: {
+    margin: '2px'
+  },
+  attributeLabel: {
+    paddingTop: '8px'
+  }
+});
+
+const chipData = [
+  "TxnTM",
+  "TrdDt",
+  "CumQty",
+  "LeavesQty",
+  "LastMkt",
+  "LastPX",
+  "LastQty",
+  "ExecTyp",
+];
+
+const Trades = () => {
+  const classes = useStyles();
+  const [open, setOpen] = useState(false);
+  const [selectedAttrs, setSelectedAttrs] = useState(new Set<string>());
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setSelectedAttrs(new Set());
+    setOpen(false);
+  };
+
+  const handleDelete = (attr: string) => {
+    // console.info('You clicked the delete icon.');
+    setSelectedAttrs(oldAttrs => {
+      oldAttrs.delete(attr);
+      return new Set([...Array.from(oldAttrs)]);
+    });
+  };
+
+  const handleClick = (attr: string) => {
+    // console.info('You clicked the Chip.');
+    if(selectedAttrs.has(attr)) {
+      handleDelete(attr);
+      return;
+    }
+    setSelectedAttrs(oldAttrs => {
+      return new Set([...Array.from(oldAttrs), attr]);
+    });
+  };
+
+  const buildFormDetails = () => {
+    return (
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="trade-model-details-dialog"
+      >
+        <DialogTitle id="trade-model-details-dialog">
+          Trade Model Details
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            To create a new trade model enter the below information.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Trade Model Name"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            fullWidth
+          />
+          <TextField
+            margin="dense"
+            label="Trade Channel Name"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            fullWidth
+          />
+          <InputLabel shrink={true} classes={
+            {
+              root: classes.attributeLabel
+            }
+          }>Trade Attributes</InputLabel>
+          <Paper component="ul" className={classes.root} elevation={3}>
+            {chipData.map((attribute, idx) => {
+              return (
+                <li key={idx}>
+                  <Chip
+                    label={attribute}
+                    clickable
+                    color={selectedAttrs.has(attribute) ? "primary" : undefined}
+                    onClick={() => handleClick(attribute)}
+                    onDelete={selectedAttrs.has(attribute) ? () => handleDelete(attribute) : undefined}
+                    deleteIcon={selectedAttrs.has(attribute) ? <DoneIcon /> : undefined}
+                    className={classes.chip}
+                  />
+                </li>
+              );
+            })}
+          </Paper>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleClose} color="primary">
+            Create
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  };
+
+  return (
+    <Box>
+      {buildFormDetails()}
+      <Box display="flex" justifyContent="flex-end" marginBottom="20px">
+        <Button
+          color="primary"
+          variant="outlined"
+          size="small"
+          onClick={handleClickOpen}
+        >
+          + New Trade
+        </Button>
+      </Box>
+      <Box>
+        <TableContainer component={Paper}>
+          <Table className={classes.table} aria-label="Trade Models">
+            <TableHead>
+              <TableRow>
+                <StyledTableCell>Trade ID</StyledTableCell>
+                <StyledTableCell>Trade Model Name</StyledTableCell>
+                <StyledTableCell>Trade Channel Name</StyledTableCell>
+                <StyledTableCell>Show Trade Model</StyledTableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.map((row) => (
+                <StyledTableRow key={row.tradeId}>
+                  <StyledTableCell component="th" scope="row">
+                    {row.tradeId}
+                  </StyledTableCell>
+                  <StyledTableCell>{row.tradeModelName}</StyledTableCell>
+                  <StyledTableCell>{row.tradeChannelName}</StyledTableCell>
+                  <StyledTableCell>
+                    <Button color="primary" variant="outlined" size="small">
+                      Show/ Edit Details
+                    </Button>
+                  </StyledTableCell>
+                </StyledTableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
+    </Box>
+  );
+};
+
+export default Trades;
