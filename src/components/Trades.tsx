@@ -23,19 +23,33 @@ import DoneIcon from "@material-ui/icons/Done";
 import HelpIcon from "@material-ui/icons/Help";
 import InputLabel from "@material-ui/core/InputLabel/InputLabel";
 import Tooltip from "@material-ui/core/Tooltip";
+import { AttributeType, TradeAttributes } from "./../types/Trade";
+import TradeModel from "./TradeModel";
 
 function createData(
   tradeId: string,
   tradeModelName: string,
-  tradeChannelName: string
+  tradeChannelName: string,
+  attributes: Array<AttributeType>
 ) {
-  return { tradeId, tradeModelName, tradeChannelName };
+  return { tradeId, tradeModelName, tradeChannelName, attributes };
 }
 
 const rows = [
-  createData("TM000027", "XP Investments - Equity", "XP Investments - Fix"),
-  createData("TM000028", "MP Investments - Equity", "MP Investments - Fix"),
-  createData("TM000030", "MLM Investments - Forex", "MLM Investments - Fix"),
+  createData("TM000027", "XP Investments - Equity", "XP Investments - Fix", [
+    "LastMkt",
+    "ExecTyp",
+  ]),
+  createData("TM000028", "MP Investments - Equity", "MP Investments - Fix", [
+    "CumQty",
+    "LeavesQty",
+    "TrdDt",
+  ]),
+  createData("TM000030", "MLM Investments - Forex", "MLM Investments - Fix", [
+    "TxnTM",
+    "LastPX",
+    "LastMkt",
+  ]),
 ];
 
 const useStyles = makeStyles({
@@ -61,21 +75,11 @@ const useStyles = makeStyles({
   },
 });
 
-const chipData = [
-  "TxnTM",
-  "TrdDt",
-  "CumQty",
-  "LeavesQty",
-  "LastMkt",
-  "LastPX",
-  "LastQty",
-  "ExecTyp",
-];
-
 const Trades = () => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [selectedAttrs, setSelectedAttrs] = useState(new Set<string>());
+  const [selectedTrade, setSelectedTrade] = useState(null as any);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -87,7 +91,6 @@ const Trades = () => {
   };
 
   const handleDelete = (attr: string) => {
-    // console.info('You clicked the delete icon.');
     setSelectedAttrs((oldAttrs) => {
       oldAttrs.delete(attr);
       return new Set([...Array.from(oldAttrs)]);
@@ -95,7 +98,6 @@ const Trades = () => {
   };
 
   const handleClick = (attr: string) => {
-    // console.info('You clicked the Chip.');
     if (selectedAttrs.has(attr)) {
       handleDelete(attr);
       return;
@@ -152,7 +154,7 @@ const Trades = () => {
             &nbsp;
           </InputLabel>
           <Paper component="ul" className={classes.root} elevation={3}>
-            {chipData.map((attribute, idx) => {
+            {TradeAttributes.map((attribute, idx) => {
               return (
                 <li key={idx}>
                   <Chip
@@ -190,6 +192,15 @@ const Trades = () => {
 
   return (
     <Box>
+      {selectedTrade && (
+        <TradeModel
+          open={!!selectedTrade}
+          trade={selectedTrade}
+          onClose={(close: boolean) => {
+            setSelectedTrade(null);
+          }}
+        />
+      )}
       {buildFormDetails()}
       <Box display="flex" justifyContent="flex-end" marginBottom="20px">
         <Button
@@ -221,7 +232,12 @@ const Trades = () => {
                   <StyledTableCell>{row.tradeModelName}</StyledTableCell>
                   <StyledTableCell>{row.tradeChannelName}</StyledTableCell>
                   <StyledTableCell>
-                    <Button color="primary" variant="outlined" size="small">
+                    <Button
+                      color="primary"
+                      variant="outlined"
+                      size="small"
+                      onClick={() => setSelectedTrade(row)}
+                    >
                       Show/ Edit Details
                     </Button>
                   </StyledTableCell>
