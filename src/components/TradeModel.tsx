@@ -17,7 +17,8 @@ import HelpIcon from "@material-ui/icons/Help";
 import DoneIcon from "@material-ui/icons/Done";
 import { AttributeType, Trade, TradeAttributes } from "./../types/Trade";
 import * as yup from "yup";
-import { Form, Formik, useFormik } from "formik";
+import { useFormik } from "formik";
+import { FormHelperText } from "@material-ui/core";
 
 const useStyles = makeStyles({
   root: {
@@ -215,6 +216,11 @@ const TradeModel: React.FC<{
               );
             })}
           </Paper>
+          {!selectedAttrs.size && (
+            <FormHelperText error>
+              Atleast one attribute must be selected
+            </FormHelperText>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose} color="primary">
