@@ -11,4 +11,12 @@ export const TradeAttributes = [
 
 export type AttributeType = typeof TradeAttributes[number];
 
+export type Trade = {
+    tradeModelId: string;
+    tradeModelName: string;
+    tradeChannelName: string;
+    attributes: Array<AttributeType>;
+};
+  
+
   

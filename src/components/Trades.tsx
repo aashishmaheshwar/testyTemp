@@ -27,12 +27,12 @@ import { AttributeType, TradeAttributes } from "./../types/Trade";
 import TradeModel from "./TradeModel";
 
 function createData(
-  tradeId: string,
+  tradeModelId: string,
   tradeModelName: string,
   tradeChannelName: string,
   attributes: Array<AttributeType>
 ) {
-  return { tradeId, tradeModelName, tradeChannelName, attributes };
+  return { tradeModelId, tradeModelName, tradeChannelName, attributes };
 }
 
 const rows = [
@@ -196,7 +196,7 @@ const Trades = () => {
         <TradeModel
           open={!!selectedTrade}
           trade={selectedTrade}
-          onClose={(close: boolean) => {
+          onClose={() => {
             setSelectedTrade(null);
           }}
         />
@@ -225,9 +225,9 @@ const Trades = () => {
             </TableHead>
             <TableBody>
               {rows.map((row) => (
-                <StyledTableRow key={row.tradeId}>
+                <StyledTableRow key={row.tradeModelId}>
                   <StyledTableCell component="th" scope="row">
-                    {row.tradeId}
+                    {row.tradeModelId}
                   </StyledTableCell>
                   <StyledTableCell>{row.tradeModelName}</StyledTableCell>
                   <StyledTableCell>{row.tradeChannelName}</StyledTableCell>
