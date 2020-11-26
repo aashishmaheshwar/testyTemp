@@ -15,8 +15,12 @@ import {
 import React, { useState } from "react";
 import HelpIcon from "@material-ui/icons/Help";
 import DoneIcon from "@material-ui/icons/Done";
-import { AttributeType, Trade, TradeAttributes } from "./../types/Trade";
-import * as yup from "yup";
+import {
+  AttributeType,
+  Trade,
+  TradeAttributes,
+  TradeModelValidationSchema,
+} from "./../types/Trade";
 import { useFormik } from "formik";
 import { FormHelperText } from "@material-ui/core";
 
@@ -40,11 +44,6 @@ const useStyles = makeStyles({
   },
 });
 
-const validationSchema = yup.object().shape({
-  tradeModelName: yup.string().required("Trade Model Name is required"),
-  tradeChannelName: yup.string().required("Trade Channel Name is required"),
-});
-
 const TradeModel: React.FC<{
   open: boolean;
   onClose: any;
@@ -61,7 +60,7 @@ const TradeModel: React.FC<{
       tradeModelName: trade.tradeModelName,
       tradeChannelName: trade.tradeChannelName,
     },
-    validationSchema: validationSchema,
+    validationSchema: TradeModelValidationSchema,
     onSubmit: (values) => {
       alert(JSON.stringify(values, null, 2));
       if (selectedAttrs.size) {
@@ -72,21 +71,17 @@ const TradeModel: React.FC<{
   });
 
   const handleDelete = (attr: AttributeType) => {
-    // formik.dirty = true;
     setSelectedAttrs((oldAttrs) => {
       oldAttrs.delete(attr);
-      //   formik.isValid = oldAttrs.size ? formik.isValid && true : false;
       return new Set([...Array.from(oldAttrs)]);
     });
   };
 
   const handleClick = (attr: AttributeType) => {
-    // formik.dirty = true;
     if (selectedAttrs.has(attr)) {
       handleDelete(attr);
       return;
     }
-    // formik.isValid = formik.isValid && true;
     setSelectedAttrs((oldAttrs) => {
       return new Set([...Array.from(oldAttrs), attr]);
     });

@@ -9,10 +9,11 @@ export default function MainNav() {
         <Typography>ESG Trade Enabler</Typography>
       </Box>
       <Box>
+        <Button color="primary">Trades</Button>
         <Button color="primary">Trade Models</Button>
         <Button color="primary">Business Events</Button>
         <Button color="primary">Rules</Button>
-        <Button color="primary">Trades</Button>
+        <Button color="primary">Mappings</Button>
       </Box>
       <Box flexGrow={1} textAlign="right">
         <IconButton>
