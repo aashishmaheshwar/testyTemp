@@ -9,6 +9,7 @@ import {
   Switch,
 } from "react-router-dom";
 import Trades from "./components/Trades";
+import BusinessEvents from "./components/BusinessEvents";
 
 function App() {
   return (
@@ -23,7 +24,11 @@ function App() {
             <Switch>
               <Route path="/tradeModels" exact component={Trades} />
               {/* use react-awesome-query-builder for trigger conditions*/}
-              {/* <Route path="/businessEvents" exact component={BusinessEvents} /> */}
+              <Route
+                path="/businessEvents"
+                exact
+                render={(props) => <BusinessEvents {...props} isNew={true} />}
+              />
               <Route path="**" exact>
                 <Redirect to="/tradeModels" />
               </Route>
