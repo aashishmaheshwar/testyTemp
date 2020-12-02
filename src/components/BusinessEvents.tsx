@@ -4,6 +4,7 @@ import { useFormik } from "formik";
 import RuleQueryBuilder from "../core/components/QueryBuilder";
 import BusinessEventTriggerConfig from "../configs/BusinessEventTriggerConfig";
 import {
+  Button,
   Input,
   InputLabel,
   makeStyles,
@@ -12,6 +13,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import HelpIcon from "@material-ui/icons/Help";
+import { BusinessEventValidationSchema } from "../configs/BusinessEvent";
 
 const useStyles = makeStyles({
   triggerConditionLabel: {
@@ -28,7 +30,8 @@ const BusinessEvents = ({ isNew = false }: { isNew: boolean }) => {
       tradeModelId: "",
       triggerCondition: "",
     },
-    // validationSchema: TradeModelValidationSchema,
+    validationSchema: BusinessEventValidationSchema,
+    // validateOnBlur: false,
     onSubmit: (values) => {
       alert(JSON.stringify(values, null, 2));
     },
@@ -42,7 +45,6 @@ const BusinessEvents = ({ isNew = false }: { isNew: boolean }) => {
       <form onSubmit={formik.handleSubmit}>
         {!isNew && (
           <TextField
-            autoFocus
             margin="dense"
             label="Business Event Id"
             InputLabelProps={{
@@ -54,17 +56,11 @@ const BusinessEvents = ({ isNew = false }: { isNew: boolean }) => {
             value={formik.values.businessEventId}
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}
-            error={
-              formik.touched.businessEventId &&
-              Boolean(formik.errors.businessEventId)
-            }
-            helperText={
-              formik.touched.businessEventId && formik.errors.businessEventId
-            }
           />
         )}
         <TextField
           autoFocus
+          required
           margin="dense"
           label="Business Event Name"
           InputLabelProps={{
@@ -76,11 +72,12 @@ const BusinessEvents = ({ isNew = false }: { isNew: boolean }) => {
           onBlur={formik.handleBlur}
           onChange={formik.handleChange}
           error={
-            formik.touched.businessEventName &&
+            // formik.touched.businessEventName &&
             Boolean(formik.errors.businessEventName)
           }
           helperText={
-            formik.touched.businessEventName && formik.errors.businessEventName
+            // formik.touched.businessEventName &&
+            formik.errors.businessEventName
           }
         />
         {/* trade model id drop down */}
@@ -91,9 +88,8 @@ const BusinessEvents = ({ isNew = false }: { isNew: boolean }) => {
           classes={{
             root: classes.triggerConditionLabel,
           }}
-          // error={!selectedAttrs.size}
         >
-          Trigger Condition&nbsp;
+          Configure Rules&nbsp;
           <Tooltip title="Add rules to create a trigger condition">
             <HelpIcon />
           </Tooltip>
@@ -102,100 +98,48 @@ const BusinessEvents = ({ isNew = false }: { isNew: boolean }) => {
         <RuleQueryBuilder
           buildConfig={BusinessEventTriggerConfig}
           onTriggerCondition={(e: string) => {
+            // !formik.touched.triggerCondition &&
+            //   (formik.values.triggerCondition || e) &&
+            //   formik.setFieldTouched("triggerCondition", true);
+            if (e) {
+              formik.setFieldError("triggerCondition", "");
+            }
+            /*else {
+              if (formik.values.triggerCondition) {
+
+              }
+            }*/
             formik.setFieldValue("triggerCondition", e);
           }}
         />
-        <Input
+        <TextField
           margin="dense"
+          required
+          disabled
+          label="Trigger Condition"
+          InputLabelProps={{
+            shrink: true,
+          }}
           name="triggerCondition"
+          id="businessEventTriggerCondition"
           fullWidth
           value={formik.values.triggerCondition}
-          //   disabled
-          id="businessEventTriggerCondition"
+          error={
+            // formik.touched.triggerCondition &&
+            Boolean(formik.errors.triggerCondition)
+          }
+          helperText={
+            // formik.touched.triggerCondition &&
+            formik.errors.triggerCondition
+          }
+          // disabled={!formik.errors.triggerCondition}
         />
-      </form>
-      {/* <form onSubmit={formik.handleSubmit}>
-            To create a new trade model enter the below information.
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Trade Model Id"
-            InputLabelProps={{
-              shrink: true,
-            }}
-            name="tradeModelId"
-            fullWidth
-            disabled
-            value={formik.values.tradeModelId}
-          />
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Trade Model Name"
-            InputLabelProps={{
-              shrink: true,
-            }}
-            fullWidth
-            required
-            name="tradeModelName"
-            value={formik.values.tradeModelName}
-            onBlur={formik.handleBlur}
-            onChange={formik.handleChange}
-            error={
-              formik.touched.tradeModelName &&
-              Boolean(formik.errors.tradeModelName)
-            }
-            helperText={
-              formik.touched.tradeModelName && formik.errors.tradeModelName
-            }
-          />
-          <TextField
-            margin="dense"
-            label="Trade Channel Name"
-            InputLabelProps={{
-              shrink: true,
-            }}
-            fullWidth
-            required
-            name="tradeChannelName"
-            value={formik.values.tradeChannelName}
-            onBlur={formik.handleBlur}
-            onChange={formik.handleChange}
-            error={
-              formik.touched.tradeChannelName &&
-              Boolean(formik.errors.tradeChannelName)
-            }
-            helperText={
-              formik.touched.tradeChannelName && formik.errors.tradeChannelName
-            }
-          />
-          <InputLabel
-            required
-            shrink={true}
-            classes={{
-              root: classes.attributeLabel,
-            }}
-            error={!selectedAttrs.size}
-          >
-            Trade Attributes&nbsp;
-            <Tooltip title="Select atleast one attribute">
-              <HelpIcon />
-            </Tooltip>
-            &nbsp;
-          </InputLabel>
-            <FormHelperText error>
-              Atleast one attribute must be selected
-            </FormHelperText>
-          <Box>
-        //       <Button onClick={onClose} color="primary">
-        //     Cancel
-        //   </Button> 
-          <Button color="primary" type="submit"> 
-          // disabled={isDisabled()} 
+        <Box>
+          <Button color="primary" type="submit">
             Next
           </Button>
-          </Box>
-      </form> */}
+        </Box>
+      </form>
     </Box>
   );
 };

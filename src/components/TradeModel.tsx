@@ -15,12 +15,8 @@ import {
 import React, { useState } from "react";
 import HelpIcon from "@material-ui/icons/Help";
 import DoneIcon from "@material-ui/icons/Done";
-import {
-  AttributeType,
-  Trade,
-  TradeAttributes,
-  TradeModelValidationSchema,
-} from "./../types/Trade";
+import { AttributeType, Trade, TradeAttributes } from "./../types/Trade";
+import { TradeModelValidationSchema } from "../configs/TradeModel";
 import { useFormik } from "formik";
 import { FormHelperText } from "@material-ui/core";
 
