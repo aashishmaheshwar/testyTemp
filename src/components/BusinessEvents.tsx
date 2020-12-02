@@ -12,6 +12,7 @@ import {
   Tooltip,
   Typography,
 } from "@material-ui/core";
+import Autocomplete from "@material-ui/lab/Autocomplete";
 import HelpIcon from "@material-ui/icons/Help";
 import { BusinessEventValidationSchema } from "../configs/BusinessEvent";
 
@@ -19,7 +20,12 @@ const useStyles = makeStyles({
   triggerConditionLabel: {
     textAlign: "start",
   },
+  businessEventName: {
+    marginBottom: "15px",
+  },
 });
+
+const tradeModels = [{ id: "TM000027", name: "XP Investments - Equity" }];
 
 const BusinessEvents = ({ isNew = false }: { isNew: boolean }) => {
   const classes = useStyles();
@@ -27,7 +33,7 @@ const BusinessEvents = ({ isNew = false }: { isNew: boolean }) => {
     initialValues: {
       businessEventId: "",
       businessEventName: "",
-      tradeModelId: "",
+      tradeModelId: null,
       triggerCondition: "",
     },
     validationSchema: BusinessEventValidationSchema,
@@ -78,8 +84,32 @@ const BusinessEvents = ({ isNew = false }: { isNew: boolean }) => {
           helperText={
             formik.touched.businessEventName && formik.errors.businessEventName
           }
+          className={classes.businessEventName}
         />
         {/* trade model id drop down */}
+        <Autocomplete
+          // id="combo-box-demo"
+          fullWidth
+          value={formik.values.tradeModelId as any}
+          onChange={(event: any, newValue: any | null) => {
+            formik.setFieldValue("tradeModelId", newValue);
+          }}
+          options={tradeModels} // fetched asynchronously; maybe elastic search
+          getOptionLabel={({ id, name }: { id: string; name: string }) =>
+            `${id} : ${name}`
+          }
+          renderInput={(params: any) => (
+            <TextField
+              {...params}
+              required
+              label="Trade Model Id"
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          )}
+        />
+        <br />
         <InputLabel
           required
           shrink={true}

@@ -18,6 +18,13 @@ const useStyles = makeStyles({
     "& .group--actions": {
       opacity: "1 !important",
     },
+    "& .rule--body": {
+      textAlign: "start",
+    },
+    // "& .group-or-rule": {
+    //   background: "whitesmoke",
+    //   border: "1px solid lightgrey",
+    // },
   },
 });
 
