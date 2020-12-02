@@ -116,6 +116,7 @@ const BusinessEvents = ({ isNew = false }: { isNew: boolean }) => {
           margin="dense"
           required
           disabled
+          multiline
           label="Trigger Condition"
           InputLabelProps={{
             shrink: true,
