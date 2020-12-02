@@ -72,12 +72,11 @@ const BusinessEvents = ({ isNew = false }: { isNew: boolean }) => {
           onBlur={formik.handleBlur}
           onChange={formik.handleChange}
           error={
-            // formik.touched.businessEventName &&
+            formik.touched.businessEventName &&
             Boolean(formik.errors.businessEventName)
           }
           helperText={
-            // formik.touched.businessEventName &&
-            formik.errors.businessEventName
+            formik.touched.businessEventName && formik.errors.businessEventName
           }
         />
         {/* trade model id drop down */}
@@ -98,9 +97,9 @@ const BusinessEvents = ({ isNew = false }: { isNew: boolean }) => {
         <RuleQueryBuilder
           buildConfig={BusinessEventTriggerConfig}
           onTriggerCondition={(e: string) => {
-            // !formik.touched.triggerCondition &&
-            //   (formik.values.triggerCondition || e) &&
-            //   formik.setFieldTouched("triggerCondition", true);
+            !formik.touched.triggerCondition &&
+              (formik.values.triggerCondition || e) &&
+              formik.setFieldTouched("triggerCondition", true);
             if (e) {
               formik.setFieldError("triggerCondition", "");
             }
@@ -126,12 +125,11 @@ const BusinessEvents = ({ isNew = false }: { isNew: boolean }) => {
           fullWidth
           value={formik.values.triggerCondition}
           error={
-            // formik.touched.triggerCondition &&
+            formik.touched.triggerCondition &&
             Boolean(formik.errors.triggerCondition)
           }
           helperText={
-            // formik.touched.triggerCondition &&
-            formik.errors.triggerCondition
+            formik.touched.triggerCondition && formik.errors.triggerCondition
           }
           // disabled={!formik.errors.triggerCondition}
         />

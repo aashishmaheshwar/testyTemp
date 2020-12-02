@@ -6,13 +6,23 @@ import { Query, Builder, Utils as QbUtils } from "react-awesome-query-builder";
 
 // For Material-UI widgets only:
 import MaterialConfig from "react-awesome-query-builder/lib/config/material";
+import { makeStyles } from "@material-ui/core";
 // Choose your skin (ant/material/vanilla):
 const InitialConfig = MaterialConfig; // or MaterialConfig or BasicConfig
 
 // You can load query value from your backend storage (for saving see `Query.onChange()`)
 const queryValue = { id: QbUtils.uuid(), type: "group" };
 
+const useStyles = makeStyles({
+  root: {
+    "& .group--actions": {
+      opacity: "1 !important",
+    },
+  },
+});
+
 const RuleQueryBuilder = ({ buildConfig, onTriggerCondition }: any) => {
+  const classes = useStyles();
   const [config, setConfig] = useState({
     ...InitialConfig,
     ...buildConfig,
@@ -54,7 +64,7 @@ const RuleQueryBuilder = ({ buildConfig, onTriggerCondition }: any) => {
   );
 
   return (
-    <div>
+    <div className={classes.root}>
       <Query
         {...config}
         value={tree}
