@@ -10,6 +10,7 @@ import {
 } from "react-router-dom";
 import Trades from "./components/Trades";
 import BusinessEvents from "./components/BusinessEvents";
+import Rules from "./components/Rules";
 
 function App() {
   return (
@@ -22,15 +23,19 @@ function App() {
           {/* routes will come here */}
           <Suspense fallback={<span>Loading...</span>}>
             <Switch>
-              <Route path="/tradeModels" exact component={Trades} />
-              {/* use react-awesome-query-builder for trigger conditions*/}
+              <Route path="/tradeModel" exact component={Trades} />
               <Route
-                path="/businessEvents"
+                path="/businessEvent"
                 exact
                 render={(props) => <BusinessEvents {...props} isNew={true} />}
               />
+              <Route
+                path="/ruleModel"
+                exact
+                render={(props) => <Rules {...props} isNew={true} />}
+              />
               <Route path="**" exact>
-                <Redirect to="/tradeModels" />
+                <Redirect to="/tradeModel" />
               </Route>
               {/* component={Home} /> */}
             </Switch>

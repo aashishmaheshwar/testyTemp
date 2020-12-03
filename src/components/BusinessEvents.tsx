@@ -30,6 +30,7 @@ const tradeModels = [{ id: "TM000027", name: "XP Investments - Equity" }];
 const BusinessEvents = ({ isNew = false }: { isNew: boolean }) => {
   const classes = useStyles();
   const formik = useFormik({
+    // initial values from API
     initialValues: {
       businessEventId: "",
       businessEventName: "",
@@ -39,7 +40,14 @@ const BusinessEvents = ({ isNew = false }: { isNew: boolean }) => {
     validationSchema: BusinessEventValidationSchema,
     // validateOnBlur: false,
     onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
+      const {
+        tradeModelId: { id: tradeModelId },
+      } = values as any;
+      let postData: any = { ...values, tradeModelId };
+      if (isNew) {
+        delete postData.businessEventId;
+      }
+      alert(JSON.stringify(postData, null, 2));
     },
   });
 
