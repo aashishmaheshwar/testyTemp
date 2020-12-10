@@ -23,8 +23,12 @@ import DoneIcon from "@material-ui/icons/Done";
 import HelpIcon from "@material-ui/icons/Help";
 import InputLabel from "@material-ui/core/InputLabel/InputLabel";
 import Tooltip from "@material-ui/core/Tooltip";
+import Input from "@material-ui/core/Input";
 import { AttributeType, TradeAttributes } from "./../types/Trade";
 import TradeModel from "./TradeModel";
+import { useFormik } from "formik";
+import { TradeModelValidationSchema } from "../configs/TradeModel";
+import { FormHelperText } from "@material-ui/core";
 
 function createData(
   tradeModelId: string,
@@ -78,8 +82,35 @@ const useStyles = makeStyles({
 const Trades = () => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
-  const [selectedAttrs, setSelectedAttrs] = useState(new Set<string>());
   const [selectedTrade, setSelectedTrade] = useState(null as any);
+  const [selectedAttrs, setSelectedAttrs] = useState(
+    new Set<AttributeType | string>()
+  );
+  const [allAttributes, setAllAttributes] = useState(
+    new Set<AttributeType | string>(TradeAttributes)
+  );
+  const [chipInputVal, setChipInputVal] = useState("");
+
+  const formik = useFormik({
+    initialValues: {
+      tradeModelName: "",
+      tradeChannelName: "",
+    },
+    validationSchema: TradeModelValidationSchema,
+    onSubmit: (values) => {
+      alert(
+        JSON.stringify(
+          { ...values, attributes: Array.from(selectedAttrs) },
+          null,
+          2
+        )
+      );
+      if (selectedAttrs.size) {
+        // make the API call here - await
+        handleClose();
+      }
+    },
+  });
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -87,6 +118,7 @@ const Trades = () => {
 
   const handleClose = () => {
     setSelectedAttrs(new Set());
+    formik.resetForm();
     setOpen(false);
   };
 
@@ -107,6 +139,30 @@ const Trades = () => {
     });
   };
 
+  const isDisabled = (): boolean => {
+    if (!selectedAttrs.size) {
+      return true;
+    }
+    return !(formik.dirty && formik.isValid);
+  };
+
+  const chipInputOnKeyPress = (e: any) => {
+    if (e.key === "Enter" || e.keyCode === 13) {
+      e.preventDefault();
+      setSelectedAttrs((oldAttrs) => {
+        return new Set([...Array.from(oldAttrs), chipInputVal]);
+      });
+      setAllAttributes((oldAttrs) => {
+        return new Set([...Array.from(oldAttrs), chipInputVal]);
+      });
+      setChipInputVal("");
+    }
+  };
+
+  const chipInputOnChange = (e: any) => {
+    setChipInputVal(e.target.value.trim());
+  };
+
   const buildFormDetails = () => {
     return (
       <Dialog
@@ -117,75 +173,115 @@ const Trades = () => {
         <DialogTitle id="trade-model-details-dialog">
           Trade Model Details
         </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            To create a new trade model enter the below information.
-          </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Trade Model Name"
-            InputLabelProps={{
-              shrink: true,
-            }}
-            fullWidth
-            required
-          />
-          <TextField
-            margin="dense"
-            label="Trade Channel Name"
-            InputLabelProps={{
-              shrink: true,
-            }}
-            fullWidth
-            required
-          />
-          <InputLabel
-            required
-            shrink={true}
-            classes={{
-              root: classes.attributeLabel,
-            }}
-          >
-            Trade Attributes&nbsp;
-            <Tooltip title="Select atleast one attribute">
-              <HelpIcon />
-            </Tooltip>
-            &nbsp;
-          </InputLabel>
-          <Paper component="ul" className={classes.root} elevation={3}>
-            {TradeAttributes.map((attribute, idx) => {
-              return (
-                <li key={idx}>
-                  <Chip
-                    label={attribute}
-                    clickable
-                    variant="outlined"
-                    color={selectedAttrs.has(attribute) ? "primary" : undefined}
-                    onClick={() => handleClick(attribute)}
-                    onDelete={
-                      selectedAttrs.has(attribute)
-                        ? () => handleDelete(attribute)
-                        : undefined
-                    }
-                    deleteIcon={
-                      selectedAttrs.has(attribute) ? <DoneIcon /> : undefined
-                    }
-                    className={classes.chip}
-                  />
-                </li>
-              );
-            })}
-          </Paper>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleClose} color="primary">
-            Create
-          </Button>
-        </DialogActions>
+        <form onSubmit={formik.handleSubmit}>
+          <DialogContent>
+            <DialogContentText>
+              To create a new trade model enter the below information.
+            </DialogContentText>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Trade Model Name"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              fullWidth
+              required
+              name="tradeModelName"
+              value={formik.values.tradeModelName}
+              onBlur={formik.handleBlur}
+              onChange={formik.handleChange}
+              error={
+                formik.touched.tradeModelName &&
+                Boolean(formik.errors.tradeModelName)
+              }
+              helperText={
+                formik.touched.tradeModelName && formik.errors.tradeModelName
+              }
+            />
+            <TextField
+              margin="dense"
+              label="Trade Channel Name"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              fullWidth
+              required
+              name="tradeChannelName"
+              value={formik.values.tradeChannelName}
+              onBlur={formik.handleBlur}
+              onChange={formik.handleChange}
+              error={
+                formik.touched.tradeChannelName &&
+                Boolean(formik.errors.tradeChannelName)
+              }
+              helperText={
+                formik.touched.tradeChannelName &&
+                formik.errors.tradeChannelName
+              }
+            />
+            <InputLabel
+              required
+              shrink={true}
+              classes={{
+                root: classes.attributeLabel,
+              }}
+              error={!selectedAttrs.size}
+            >
+              Trade Attributes&nbsp;
+              <Tooltip title="Select atleast one attribute">
+                <HelpIcon />
+              </Tooltip>
+              &nbsp;
+            </InputLabel>
+            <Paper component="ul" className={classes.root} elevation={3}>
+              {Array.from(allAttributes).map((attribute, idx) => {
+                return (
+                  <li key={idx}>
+                    <Chip
+                      label={attribute}
+                      clickable
+                      variant="outlined"
+                      color={
+                        selectedAttrs.has(attribute) ? "primary" : undefined
+                      }
+                      onClick={() => handleClick(attribute)}
+                      onDelete={
+                        selectedAttrs.has(attribute)
+                          ? () => handleDelete(attribute)
+                          : undefined
+                      }
+                      deleteIcon={
+                        selectedAttrs.has(attribute) ? <DoneIcon /> : undefined
+                      }
+                      className={classes.chip}
+                    />
+                  </li>
+                );
+              })}
+              <li>
+                <Input
+                  onKeyPress={chipInputOnKeyPress}
+                  value={chipInputVal}
+                  onChange={chipInputOnChange}
+                />
+              </li>
+            </Paper>
+            {!selectedAttrs.size && (
+              <FormHelperText error>
+                Atleast one attribute must be selected
+              </FormHelperText>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} color="primary">
+              Cancel
+            </Button>
+            <Button type="submit" color="primary" disabled={isDisabled()}>
+              Create
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
     );
   };

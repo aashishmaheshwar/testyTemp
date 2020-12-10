@@ -19,6 +19,7 @@ import { AttributeType, Trade, TradeAttributes } from "./../types/Trade";
 import { TradeModelValidationSchema } from "../configs/TradeModel";
 import { useFormik } from "formik";
 import { FormHelperText } from "@material-ui/core";
+import Input from "@material-ui/core/Input";
 
 const useStyles = makeStyles({
   root: {
@@ -47,8 +48,12 @@ const TradeModel: React.FC<{
 }> = ({ open, onClose, trade }) => {
   const classes = useStyles();
   const [selectedAttrs, setSelectedAttrs] = useState(
-    new Set<AttributeType>(trade.attributes)
+    new Set<AttributeType | string>(trade.attributes) // other attributes from API if present
   );
+  const [allAttributes, setAllAttributes] = useState(
+    new Set<AttributeType | string>([...TradeAttributes, ...trade.attributes])
+  );
+  const [chipInputVal, setChipInputVal] = useState("");
 
   const formik = useFormik({
     initialValues: {
@@ -58,7 +63,13 @@ const TradeModel: React.FC<{
     },
     validationSchema: TradeModelValidationSchema,
     onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
+      alert(
+        JSON.stringify(
+          { ...values, attributes: Array.from(selectedAttrs) },
+          null,
+          2
+        )
+      );
       if (selectedAttrs.size) {
         // make the API call here
         onClose();
@@ -66,14 +77,14 @@ const TradeModel: React.FC<{
     },
   });
 
-  const handleDelete = (attr: AttributeType) => {
+  const handleDelete = (attr: AttributeType | string) => {
     setSelectedAttrs((oldAttrs) => {
       oldAttrs.delete(attr);
       return new Set([...Array.from(oldAttrs)]);
     });
   };
 
-  const handleClick = (attr: AttributeType) => {
+  const handleClick = (attr: AttributeType | string) => {
     if (selectedAttrs.has(attr)) {
       handleDelete(attr);
       return;
@@ -100,6 +111,23 @@ const TradeModel: React.FC<{
       return true && !formik.isValid;
     }
     return !(formik.dirty && formik.isValid);
+  };
+
+  const chipInputOnKeyPress = (e: any) => {
+    if (e.key === "Enter" || e.keyCode === 13) {
+      e.preventDefault();
+      setSelectedAttrs((oldAttrs) => {
+        return new Set([...Array.from(oldAttrs), chipInputVal]);
+      });
+      setAllAttributes((oldAttrs) => {
+        return new Set([...Array.from(oldAttrs), chipInputVal]);
+      });
+      setChipInputVal("");
+    }
+  };
+
+  const chipInputOnChange = (e: any) => {
+    setChipInputVal(e.target.value.trim());
   };
 
   return (
@@ -184,7 +212,7 @@ const TradeModel: React.FC<{
             &nbsp;
           </InputLabel>
           <Paper component="ul" className={classes.root} elevation={3}>
-            {TradeAttributes.map((attribute, idx) => {
+            {Array.from(allAttributes).map((attribute, idx) => {
               return (
                 <li key={idx}>
                   <Chip
@@ -206,6 +234,13 @@ const TradeModel: React.FC<{
                 </li>
               );
             })}
+            <li>
+              <Input
+                onKeyPress={chipInputOnKeyPress}
+                value={chipInputVal}
+                onChange={chipInputOnChange}
+              />
+            </li>
           </Paper>
           {!selectedAttrs.size && (
             <FormHelperText error>
