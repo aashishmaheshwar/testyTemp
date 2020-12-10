@@ -226,7 +226,7 @@ const Trades = () => {
               classes={{
                 root: classes.attributeLabel,
               }}
-              error={!selectedAttrs.size}
+              error={!selectedAttrs.size && formik.dirty}
             >
               Trade Attributes&nbsp;
               <Tooltip title="Select atleast one attribute">
@@ -268,7 +268,7 @@ const Trades = () => {
               </li>
             </Paper>
             {!selectedAttrs.size && (
-              <FormHelperText error>
+              <FormHelperText error={formik.dirty}>
                 Atleast one attribute must be selected
               </FormHelperText>
             )}
