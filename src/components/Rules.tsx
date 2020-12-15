@@ -1,6 +1,13 @@
 import React from "react";
 import Box from "@material-ui/core/Box";
-import { useFormik } from "formik";
+import {
+  useFormik,
+  Formik,
+  Form,
+  Field,
+  FieldArray,
+  ErrorMessage,
+} from "formik";
 import RuleQueryBuilder from "../core/components/QueryBuilder";
 import BusinessEventTriggerConfig from "../configs/BusinessEventTriggerConfig";
 import {
@@ -92,7 +99,6 @@ const Rules = ({ isNew = false }: { isNew: boolean }) => {
         />
         <br />
         <TextField
-          autoFocus
           required
           margin="dense"
           label="Rule Name"
@@ -110,6 +116,9 @@ const Rules = ({ isNew = false }: { isNew: boolean }) => {
         />
         <br />
         {/* placeholder for adding rule attributes */}
+        <h4>Attributes</h4>
+        <ul style={{ listStyle: "none" }}></ul>
+        <Button>Add Attribute</Button>
         <Box>
           <Button color="primary" type="submit">
             Submit

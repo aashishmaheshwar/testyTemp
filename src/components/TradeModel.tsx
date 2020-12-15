@@ -253,7 +253,7 @@ const TradeModel: React.FC<{
             Cancel
           </Button>
           <Button color="primary" type="submit" disabled={isDisabled()}>
-            Create
+            Update
           </Button>
         </DialogActions>
       </form>

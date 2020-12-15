@@ -120,6 +120,7 @@ const Trades = () => {
     setSelectedAttrs(new Set());
     formik.resetForm();
     setOpen(false);
+    setAllAttributes(new Set(TradeAttributes));
   };
 
   const handleDelete = (attr: string) => {
