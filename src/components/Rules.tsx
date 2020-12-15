@@ -11,10 +11,14 @@ import {
 } from "formik";
 import {
   Button,
+  FormControl,
   FormHelperText,
+  InputLabel,
   // Input,
   // InputLabel,
   makeStyles,
+  MenuItem,
+  Select,
   TextField,
   // Tooltip,
   Typography,
@@ -156,6 +160,34 @@ const Rules = ({ isNew = false }: { isNew: boolean }) => {
                               error={!!(touchedName && errorName)}
                               helperText={touchedName && errorName}
                             />
+                            <FormControl
+                              error={Boolean(touchedType && errorType)}
+                            >
+                              <InputLabel shrink id={type}>
+                                Type
+                              </InputLabel>
+                              <Select
+                                labelId={type}
+                                {...getFieldProps(type)}
+                                // value={(values as any)[type]}
+                                // onChange={(
+                                //   event: any,
+                                //   newValue: any | null
+                                // ) => {
+                                //   setFieldValue(type, newValue);
+                                // }}
+                              >
+                                <MenuItem value={"ENUM"}>ENUM</MenuItem>
+                                <MenuItem value={"CHAR"}>CHAR</MenuItem>
+                                <MenuItem value={"DECIMAL"}>DECIMAL</MenuItem>
+                                <MenuItem value={"DATE"}>DATE</MenuItem>
+                                <MenuItem value={"TIME"}>TIME</MenuItem>
+                                <MenuItem value={"DATETIME"}>DATETIME</MenuItem>
+                              </Select>
+                              {touchedType && errorType && (
+                                <FormHelperText>{errorType}</FormHelperText>
+                              )}
+                            </FormControl>
                             <Button onClick={() => remove(idx)}>Remove</Button>
                           </Box>
                         );
@@ -167,9 +199,7 @@ const Rules = ({ isNew = false }: { isNew: boolean }) => {
                       </FormHelperText>
                     )}
                     <Button
-                      onClick={() =>
-                        push({ name: "", type: "", id: Math.random() })
-                      }
+                      onClick={() => push({ name: "", id: Math.random() })}
                     >
                       Add Attribute
                     </Button>
