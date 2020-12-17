@@ -11,6 +11,7 @@ import {
 } from "formik";
 import {
   Button,
+  createStyles,
   FormControl,
   FormHelperText,
   InputLabel,
@@ -18,8 +19,10 @@ import {
   // InputLabel,
   makeStyles,
   MenuItem,
+  Paper,
   Select,
   TextField,
+  Theme,
   // Tooltip,
   Typography,
 } from "@material-ui/core";
@@ -27,29 +30,46 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 // import HelpIcon from "@material-ui/icons/Help";
 import { RuleModelValidationSchema } from "../configs/RuleModel";
 
-const useStyles = makeStyles({
-  ruleName: {
-    marginBottom: "15px",
-  },
-  attributeWrapper: {
-    display: "flex",
-    flexDirection: "column",
-    rowGap: "15px",
-    "& > div": {
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    ruleName: {
+      marginBottom: "15px",
+    },
+    attributeWrapper: {
       display: "flex",
+      flexDirection: "column",
+      rowGap: "15px",
       "& > div": {
-        flex: 1,
-        "&.MuiTextField-root": {
-          margin: "3px 10px 0 0",
+        display: "flex",
+        "& > ul": {
+          flex: 2,
         },
-        marginRight: "10px",
-        "& .MuiSelect-root": {
-          textAlign: "left",
+        "& > div": {
+          "&.MuiFormControl-root": {
+            flex: 1,
+          },
+          "&.MuiTextField-root": {
+            flex: 3,
+            margin: "3px 10px 0 0",
+          },
+          marginRight: "10px",
+          "& .MuiSelect-root": {
+            textAlign: "left",
+          },
         },
       },
     },
-  },
-});
+    valuesRoot: {
+      display: "flex",
+      justifyContent: "center",
+      flexWrap: "wrap",
+      listStyle: "none",
+      padding: theme.spacing(0.5),
+      margin: 0,
+      maxWidth: "300px",
+    },
+  })
+);
 
 const ruleTypes = [{ id: "REG", name: "Regular" }];
 
@@ -196,6 +216,12 @@ const Rules = ({ isNew = false }: { isNew: boolean }) => {
                                 <FormHelperText>{errorType}</FormHelperText>
                               )}
                             </FormControl>
+                            <Paper
+                              component="ul"
+                              className={classes.valuesRoot}
+                            >
+                              <li></li>
+                            </Paper>
                             <Button onClick={() => remove(idx)}>Remove</Button>
                           </Box>
                         );
