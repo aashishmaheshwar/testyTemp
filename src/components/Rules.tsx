@@ -31,6 +31,24 @@ const useStyles = makeStyles({
   ruleName: {
     marginBottom: "15px",
   },
+  attributeWrapper: {
+    display: "flex",
+    flexDirection: "column",
+    rowGap: "15px",
+    "& > div": {
+      display: "flex",
+      "& > div": {
+        flex: 1,
+        "&.MuiTextField-root": {
+          margin: "3px 10px 0 0",
+        },
+        marginRight: "10px",
+        "& .MuiSelect-root": {
+          textAlign: "left",
+        },
+      },
+    },
+  },
 });
 
 const ruleTypes = [{ id: "REG", name: "Regular" }];
@@ -137,7 +155,7 @@ const Rules = ({ isNew = false }: { isNew: boolean }) => {
               {({ push, remove }) => {
                 return (
                   <>
-                    <Box style={{ display: "flex", flexDirection: "column" }}>
+                    <Box className={classes.attributeWrapper}>
                       {values.attributes.map((attribute, idx) => {
                         const name = `attributes[${idx}].name`;
                         const touchedName = getIn(touched, name);
@@ -148,7 +166,7 @@ const Rules = ({ isNew = false }: { isNew: boolean }) => {
                         const errorType = getIn(errors, type);
 
                         return (
-                          <Box key={attribute.id} display="flex">
+                          <Box key={attribute.id}>
                             <TextField
                               margin="dense"
                               label="Name"
@@ -166,17 +184,7 @@ const Rules = ({ isNew = false }: { isNew: boolean }) => {
                               <InputLabel shrink id={type}>
                                 Type
                               </InputLabel>
-                              <Select
-                                labelId={type}
-                                {...getFieldProps(type)}
-                                // value={(values as any)[type]}
-                                // onChange={(
-                                //   event: any,
-                                //   newValue: any | null
-                                // ) => {
-                                //   setFieldValue(type, newValue);
-                                // }}
-                              >
+                              <Select labelId={type} {...getFieldProps(type)}>
                                 <MenuItem value={"ENUM"}>ENUM</MenuItem>
                                 <MenuItem value={"CHAR"}>CHAR</MenuItem>
                                 <MenuItem value={"DECIMAL"}>DECIMAL</MenuItem>
@@ -199,7 +207,9 @@ const Rules = ({ isNew = false }: { isNew: boolean }) => {
                       </FormHelperText>
                     )}
                     <Button
-                      onClick={() => push({ name: "", id: Math.random() })}
+                      onClick={() =>
+                        push({ name: "", type: "", id: Math.random() })
+                      }
                     >
                       Add Attribute
                     </Button>
