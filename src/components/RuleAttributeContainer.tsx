@@ -4,23 +4,16 @@ import Box from "@material-ui/core/Box";
 import {
   Button,
   Chip,
-  createStyles,
   FormControl,
   FormHelperText,
   Input,
   InputLabel,
-  // Input,
-  // InputLabel,
-  makeStyles,
   MenuItem,
   Paper,
   Select,
   TextField,
-  Theme,
-  // Tooltip,
-  Typography,
 } from "@material-ui/core";
-import { useRoleModelStyles } from "./RuleModelStyles";
+import { useRuleModelStyles } from "./RuleModelStyles";
 import { RuleInitialValues } from "../configs/RuleModel";
 
 const RuleAttributeContainer = ({
@@ -29,7 +22,7 @@ const RuleAttributeContainer = ({
   formikProps: FormikProps<typeof RuleInitialValues>;
 }) => {
   const { values, errors, touched, getFieldProps, setFieldValue } = formikProps;
-  const classes = useRoleModelStyles();
+  const classes = useRuleModelStyles();
   const [chipInputVals, setChipInputVals] = useState<Array<string>>([]);
 
   return (

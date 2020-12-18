@@ -1,6 +1,6 @@
 import { createStyles, makeStyles, Theme } from "@material-ui/core";
 
-export const useRoleModelStyles = makeStyles((theme: Theme) =>
+export const useRuleModelStyles = makeStyles((theme: Theme) =>
   createStyles({
     ruleName: {
       marginBottom: "15px",
