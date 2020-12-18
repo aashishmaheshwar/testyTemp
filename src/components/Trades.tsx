@@ -77,6 +77,12 @@ const useStyles = makeStyles({
     display: "flex",
     alignItems: "center",
   },
+  attributeInputBlur: {
+    opacity: 0.3,
+  },
+  attributeInputFocus: {
+    opacity: 1,
+  },
 });
 
 const Trades = () => {
@@ -262,6 +268,10 @@ const Trades = () => {
               })}
               <li>
                 <Input
+                  classes={{
+                    root: classes.attributeInputBlur,
+                    focused: classes.attributeInputFocus,
+                  }}
                   onKeyPress={chipInputOnKeyPress}
                   value={chipInputVal}
                   onChange={chipInputOnChange}

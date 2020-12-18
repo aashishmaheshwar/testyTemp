@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Box from "@material-ui/core/Box";
 import {
   Formik,
@@ -12,9 +12,11 @@ import {
 } from "formik";
 import {
   Button,
+  Chip,
   createStyles,
   FormControl,
   FormHelperText,
+  Input,
   InputLabel,
   // Input,
   // InputLabel,
@@ -43,7 +45,7 @@ const useStyles = makeStyles((theme: Theme) =>
       "& > div": {
         display: "flex",
         "& > ul": {
-          flex: 2,
+          flex: 4,
         },
         "& > div": {
           "&.MuiFormControl-root": {
@@ -69,6 +71,15 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: 0,
       maxWidth: "300px",
     },
+    chip: {
+      margin: theme.spacing(0.5),
+    },
+    attributeInputBlur: {
+      opacity: 0.3,
+    },
+    attributeInputFocus: {
+      opacity: 1,
+    },
   })
 );
 
@@ -83,11 +94,18 @@ const initialValues = {
 
 const Rules = ({ isNew = false }: { isNew: boolean }) => {
   const classes = useStyles();
+  const [chipInputVals, setChipInputVals] = useState<Array<string>>([]);
 
   const buildAttributeContainer = (
     formikProps: FormikProps<typeof initialValues>
   ) => {
-    const { values, errors, touched, getFieldProps } = formikProps;
+    const {
+      values,
+      errors,
+      touched,
+      getFieldProps,
+      setFieldValue,
+    } = formikProps;
 
     return (
       <>
@@ -106,6 +124,57 @@ const Rules = ({ isNew = false }: { isNew: boolean }) => {
                     const touchedType = getIn(touched, type);
                     const errorType = getIn(errors, type);
 
+                    const vals = `attributes[${idx}].values`;
+                    const touchedVals = getIn(touched, vals);
+                    const errorVals = getIn(errors, vals);
+
+                    const length = `attributes[${idx}].length`;
+                    const touchedLength = getIn(touched, length);
+                    const errorLength = getIn(errors, length);
+
+                    const onAttributeTypeChange = (event: any) => {
+                      const { value } = event.target;
+                      switch (value) {
+                        case "ENUM":
+                          setFieldValue(vals, []);
+                          break;
+                      }
+                      setFieldValue(type, value);
+                    };
+
+                    const chipInputOnKeyPress = (e: any) => {
+                      if (e.key === "Enter" || e.keyCode === 13) {
+                        e.preventDefault();
+                        let newVals = Array.from(
+                          new Set([
+                            ...getFieldProps(vals).value,
+                            chipInputVals[idx],
+                          ])
+                        ).sort();
+                        setFieldValue(vals, newVals);
+                        setChipInputVals((oldArr) => {
+                          const newArr = [...oldArr];
+                          newArr[idx] = "";
+                          return newArr;
+                        });
+                      }
+                    };
+
+                    const chipInputOnChange = (e: any) => {
+                      setChipInputVals((oldVals) => {
+                        const newVals = [...oldVals];
+                        newVals[idx] = e.target.value.trim();
+                        return newVals;
+                      });
+                    };
+
+                    const handleChipDelete = (value: string) => () => {
+                      const valuesSet = new Set([...getFieldProps(vals).value]);
+                      valuesSet.delete(value);
+                      let newVals = Array.from(valuesSet).sort();
+                      setFieldValue(vals, newVals);
+                    };
+
                     return (
                       <Box key={attribute.id}>
                         <TextField
@@ -123,7 +192,11 @@ const Rules = ({ isNew = false }: { isNew: boolean }) => {
                           <InputLabel shrink id={type}>
                             Type
                           </InputLabel>
-                          <Select labelId={type} {...getFieldProps(type)}>
+                          <Select
+                            labelId={type}
+                            {...getFieldProps(type)}
+                            onChange={onAttributeTypeChange}
+                          >
                             <MenuItem value={"ENUM"}>ENUM</MenuItem>
                             <MenuItem value={"CHAR"}>CHAR</MenuItem>
                             <MenuItem value={"DECIMAL"}>DECIMAL</MenuItem>
@@ -135,9 +208,32 @@ const Rules = ({ isNew = false }: { isNew: boolean }) => {
                             <FormHelperText>{errorType}</FormHelperText>
                           )}
                         </FormControl>
-                        <Paper component="ul" className={classes.valuesRoot}>
-                          <li></li>
-                        </Paper>
+                        {getFieldProps(type).value === "ENUM" && (
+                          <Paper component="ul" className={classes.valuesRoot}>
+                            {getFieldProps(vals).value.map((attr: string) => (
+                              <li key={attr}>
+                                {/* render chips here */}
+                                <Chip
+                                  label={attr}
+                                  onDelete={handleChipDelete(attr)}
+                                  className={classes.chip}
+                                />
+                              </li>
+                            ))}
+                            {/* render input here */}
+                            <li>
+                              <Input
+                                classes={{
+                                  root: classes.attributeInputBlur,
+                                  focused: classes.attributeInputFocus,
+                                }}
+                                onKeyPress={chipInputOnKeyPress}
+                                value={chipInputVals[idx]}
+                                onChange={chipInputOnChange}
+                              />
+                            </li>
+                          </Paper>
+                        )}
                         <Button onClick={() => remove(idx)}>Remove</Button>
                       </Box>
                     );
