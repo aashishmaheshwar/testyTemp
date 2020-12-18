@@ -3,20 +3,16 @@ import Box from "@material-ui/core/Box";
 import { Formik, Form } from "formik";
 import { Button, TextField, Typography } from "@material-ui/core";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-import { RuleModelValidationSchema } from "../configs/RuleModel";
+import {
+  RuleInitialValues,
+  RuleModelValidationSchema,
+} from "../configs/RuleModel";
 import RuleAttributeContainer from "./RuleAttributeContainer";
 import { useRuleModelStyles } from "./RuleModelStyles";
 
 const ruleTypes = [{ id: "REG", name: "Regular" }];
 
-const initialValues = {
-  ruleId: "",
-  ruleName: "",
-  ruleType: null,
-  attributes: [{ name: "", type: "", id: Math.random() }],
-};
-
-const Rules = ({ isNew = false }: { isNew: boolean }) => {
+const RuleModel = ({ isNew = false }: { isNew: boolean }) => {
   const classes = useRuleModelStyles();
 
   return (
@@ -25,7 +21,7 @@ const Rules = ({ isNew = false }: { isNew: boolean }) => {
         {isNew ? "Create new Rule" : "Show/Edit Rule"}
       </Typography>
       <Formik
-        initialValues={initialValues}
+        initialValues={RuleInitialValues}
         validationSchema={RuleModelValidationSchema}
         onSubmit={(values, { resetForm, setSubmitting }) => {
           setSubmitting(true);
@@ -109,7 +105,6 @@ const Rules = ({ isNew = false }: { isNew: boolean }) => {
               />
               <br />
               {/* placeholder for adding rule attributes */}
-              {/* {buildAttributeContainer(formikProps)} */}
               <RuleAttributeContainer formikProps={formikProps} />
               <Box>
                 <Button color="primary" type="submit" disabled={isSubmitting}>
@@ -124,4 +119,4 @@ const Rules = ({ isNew = false }: { isNew: boolean }) => {
   );
 };
 
-export default Rules;
+export default RuleModel;

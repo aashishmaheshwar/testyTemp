@@ -1,5 +1,4 @@
 import React, { Suspense } from "react";
-import logo from "./logo.svg";
 import "./App.css";
 import MainNav from "./components/MainNav";
 import {
@@ -10,7 +9,7 @@ import {
 } from "react-router-dom";
 import Trades from "./components/Trades";
 import BusinessEvents from "./components/BusinessEvents";
-import Rules from "./components/Rules";
+import RuleModel from "./components/RuleModel";
 
 function App() {
   return (
@@ -32,7 +31,7 @@ function App() {
               <Route
                 path="/ruleModel"
                 exact
-                render={(props) => <Rules {...props} isNew={true} />}
+                render={(props) => <RuleModel {...props} isNew={true} />}
               />
               <Route path="**" exact>
                 <Redirect to="/tradeModel" />
