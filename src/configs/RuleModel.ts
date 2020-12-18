@@ -12,3 +12,11 @@ export const RuleModelValidationSchema = yup.object().shape({
     // triggerCondition: yup.string().required("Trigger Condition is required")
     // .required('Attributes are required')
 });
+
+export const RuleInitialValues = {
+    ruleId: "",
+    ruleName: "",
+    ruleType: null,
+    attributes: [{ name: "", type: "", id: Math.random() }],
+  };
+  
