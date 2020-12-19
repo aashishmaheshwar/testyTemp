@@ -7,11 +7,21 @@ export const RuleModelValidationSchema = yup.object().shape({
         yup.object().shape({
             name: yup.string().required('Attribute name is required'),
             type: yup.string().required('Type is required').oneOf(['ENUM', 'CHAR', 'DECIMAL', 'DATE', 'TIME', 'DATETIME']),
-            values: yup.array().of(yup.string()).min(1, 'Atleast one value is needed')
+            values: yup.array().of(yup.string()).min(1, 'Atleast one value is needed'),
+            length: yup.string().when('type', {
+                is: (val) => val === 'CHAR',
+                then: yup.string()
+                    .required('Length is required')
+                    .matches(/^[0-9]+$/, 'Enter a valid length')
+            })
+            .when('type', {
+                is: (val) => val === 'DECIMAL',
+                then: yup.string()
+                    .required('Length is required')    
+                    .matches(/^[0-9]+(,[0-9]+)?$/, 'Decimal length should be integer or <DigitCountWhole>,<DigitCountFractional>')
+            })
         })
     ).min(1, 'Atleast one attribute is needed')
-    // triggerCondition: yup.string().required("Trigger Condition is required")
-    // .required('Attributes are required')
 });
 
 export const RuleInitialValues = {
@@ -19,5 +29,5 @@ export const RuleInitialValues = {
     ruleName: "",
     ruleType: null,
     attributes: [{ name: "", type: "", id: Math.random() }],
-  };
+};
   
