@@ -12,7 +12,7 @@ export const useRuleModelStyles = makeStyles((theme: Theme) =>
       "& > div": {
         display: "flex",
         "& > ul": {
-          flex: 4,
+          flex: 4
         },
         "& > div": {
           "&.MuiFormControl-root": {
@@ -36,7 +36,7 @@ export const useRuleModelStyles = makeStyles((theme: Theme) =>
       listStyle: "none",
       padding: theme.spacing(0.5),
       margin: 0,
-      maxWidth: "300px",
+      maxWidth: "500px",
     },
     chip: {
       margin: theme.spacing(0.5),

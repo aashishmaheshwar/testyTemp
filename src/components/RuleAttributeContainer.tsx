@@ -55,6 +55,11 @@ const RuleAttributeContainer = ({
                     switch (value) {
                       case "ENUM":
                         setFieldValue(vals, []);
+                        setChipInputVals((oldArr) => {
+                          const newArr = [...oldArr];
+                          newArr[idx] = "";
+                          return newArr;
+                        });
                         break;
                     }
                     setFieldValue(type, value);
