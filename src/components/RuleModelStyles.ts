@@ -9,6 +9,7 @@ export const useRuleModelStyles = makeStyles((theme: Theme) =>
       display: "flex",
       flexDirection: "column",
       rowGap: "15px",
+      marginBottom: "20px",
       "& > div": {
         display: "flex",
         "& > ul": {

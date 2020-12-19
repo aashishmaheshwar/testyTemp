@@ -43,7 +43,6 @@ const RuleAttributeContainer = ({
                   const errorType = getIn(errors, type);
 
                   const vals = `attributes[${idx}].values`;
-                  const touchedVals = getIn(touched, vals);
                   const errorVals = getIn(errors, vals);
 
                   const length = `attributes[${idx}].length`;
@@ -61,12 +60,19 @@ const RuleAttributeContainer = ({
                           return newArr;
                         });
                         break;
+                      case "CHAR":
+                      case "DECIMAL":
+                        setFieldValue(length, "");
+                        break;
                     }
                     setFieldValue(type, value);
                   };
 
                   const chipInputOnKeyPress = (e: any) => {
-                    if (e.key === "Enter" || e.keyCode === 13) {
+                    if (
+                      (e.key === "Enter" || e.keyCode === 13) &&
+                      chipInputVals[idx].length > 0
+                    ) {
                       e.preventDefault();
                       let newVals = Array.from(
                         new Set([
@@ -133,6 +139,15 @@ const RuleAttributeContainer = ({
                       </FormControl>
                       {getFieldProps(type).value === "ENUM" && (
                         <Paper component="ul" className={classes.valuesRoot}>
+                          <li>
+                            <InputLabel
+                              shrink
+                              id={vals}
+                              error={Boolean(errorVals)}
+                            >
+                              Values
+                            </InputLabel>
+                          </li>
                           {getFieldProps(vals).value.map((attr: string) => (
                             <li key={attr}>
                               {/* render chips here */}
@@ -155,7 +170,29 @@ const RuleAttributeContainer = ({
                               onChange={chipInputOnChange}
                             />
                           </li>
+                          <li>
+                            {errorVals && (
+                              <FormHelperText error={Boolean(errorVals)}>
+                                {errorVals}
+                              </FormHelperText>
+                            )}
+                          </li>
                         </Paper>
+                      )}
+                      {["CHAR", "DECIMAL"].find(
+                        (elem) => elem === getFieldProps(type).value
+                      ) && (
+                        <TextField
+                          margin="dense"
+                          label="Length"
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          // disabled
+                          {...getFieldProps(length)}
+                          error={!!(touchedLength && errorLength)}
+                          helperText={touchedLength && errorLength}
+                        />
                       )}
                       <Button onClick={() => remove(idx)}>Remove</Button>
                     </Box>

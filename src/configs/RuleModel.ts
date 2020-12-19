@@ -6,7 +6,8 @@ export const RuleModelValidationSchema = yup.object().shape({
     attributes: yup.array().of(
         yup.object().shape({
             name: yup.string().required('Attribute name is required'),
-            type: yup.string().required('Type is required').oneOf(['ENUM', 'CHAR', 'DECIMAL', 'DATE', 'TIME', 'DATETIME'])
+            type: yup.string().required('Type is required').oneOf(['ENUM', 'CHAR', 'DECIMAL', 'DATE', 'TIME', 'DATETIME']),
+            values: yup.array().of(yup.string()).min(1, 'Atleast one value is needed')
         })
     ).min(1, 'Atleast one attribute is needed')
     // triggerCondition: yup.string().required("Trigger Condition is required")
