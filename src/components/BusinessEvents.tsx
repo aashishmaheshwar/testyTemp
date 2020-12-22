@@ -15,6 +15,7 @@ import {
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import HelpIcon from "@material-ui/icons/Help";
 import { BusinessEventValidationSchema } from "../configs/BusinessEvent";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles({
   triggerConditionLabel: {
@@ -29,6 +30,7 @@ const tradeModels = [{ id: "TM000027", name: "XP Investments - Equity" }];
 
 const BusinessEvents = ({ isNew = false }: { isNew: boolean }) => {
   const classes = useStyles();
+  const history = useHistory();
   const formik = useFormik({
     // initial values from API
     initialValues: {
@@ -48,6 +50,7 @@ const BusinessEvents = ({ isNew = false }: { isNew: boolean }) => {
         delete postData.businessEventId;
       }
       alert(JSON.stringify(postData, null, 2));
+      history.push("/businessRuleMapper");
     },
   });
 

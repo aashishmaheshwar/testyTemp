@@ -10,6 +10,7 @@ import {
 import Trades from "./components/Trades";
 import BusinessEvents from "./components/BusinessEvents";
 import RuleModel from "./components/RuleModel";
+import BusinessRuleMapper from "./components/BusinessRuleMapper";
 
 function App() {
   return (
@@ -32,6 +33,13 @@ function App() {
                 path="/ruleModel"
                 exact
                 render={(props) => <RuleModel {...props} isNew={true} />}
+              />
+              <Route
+                path="/businessRuleMapper"
+                exact
+                render={(props) => (
+                  <BusinessRuleMapper {...props} isNew={true} />
+                )}
               />
               <Route path="**" exact>
                 <Redirect to="/tradeModel" />

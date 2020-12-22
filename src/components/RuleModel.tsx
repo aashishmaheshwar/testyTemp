@@ -10,7 +10,10 @@ import {
 import RuleAttributeContainer from "./RuleAttributeContainer";
 import { useRuleModelStyles } from "./RuleModelStyles";
 
-const ruleTypes = [{ id: "REG", name: "Regular" }];
+const ruleTypes = [
+  { id: "REG", name: "Regular" },
+  { id: "ACC", name: "Account" },
+];
 
 const RuleModel = ({ isNew = false }: { isNew: boolean }) => {
   const classes = useRuleModelStyles();
