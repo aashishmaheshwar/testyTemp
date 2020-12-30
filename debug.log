@@ -10,3 +10,4 @@
 [1229/220718.541:ERROR:exception_snapshot_win.cc(99)] thread ID 6788 not found in process
 [1229/220718.541:ERROR:exception_snapshot_win.cc(99)] thread ID 10304 not found in process
 [1229/220718.541:ERROR:exception_snapshot_win.cc(99)] thread ID 12680 not found in process
+[1230/183250.896:ERROR:directory_reader_win.cc(43)] FindFirstFile: The system cannot find the path specified. (0x3)
