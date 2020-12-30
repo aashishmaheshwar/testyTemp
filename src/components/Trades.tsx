@@ -316,7 +316,7 @@ const Trades = () => {
           size="small"
           onClick={handleClickOpen}
         >
-          + New Trade - Testing
+          + New Trade
         </Button>
       </Box>
       <Box>
