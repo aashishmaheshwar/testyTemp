@@ -6,14 +6,10 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 import {
   RuleInitialValues,
   RuleModelValidationSchema,
+  RuleTypes,
 } from "../configs/RuleModel";
 import RuleAttributeContainer from "./RuleAttributeContainer";
 import { useRuleModelStyles } from "./RuleModelStyles";
-
-const ruleTypes = [
-  { id: "REG", name: "Regular" },
-  { id: "ACC", name: "Account" },
-];
 
 const RuleModel = ({ isNew = false }: { isNew: boolean }) => {
   const classes = useRuleModelStyles();
@@ -77,7 +73,7 @@ const RuleModel = ({ isNew = false }: { isNew: boolean }) => {
                 onChange={(event: any, newValue: any | null) => {
                   setFieldValue("ruleType", newValue);
                 }}
-                options={ruleTypes} // fetched asynchronously; maybe elastic search
+                options={RuleTypes} // fetched asynchronously; maybe elastic search
                 getOptionLabel={({ id, name }: { id: string; name: string }) =>
                   `${id} : ${name}`
                 }

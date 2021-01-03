@@ -1,16 +1,13 @@
 import { Box, TextField, Typography } from "@material-ui/core";
+import { Autocomplete } from "@material-ui/lab";
 import { Form, Formik } from "formik";
 import React from "react";
-
-const ruleTypes = [
-  { id: "REG", name: "Regular" },
-  { id: "ACC", name: "Account" },
-];
+import { MockRuleIds, RuleTypes } from "../configs/RuleModel";
 
 const initialValues = {
   businessEventRuleId: "",
-  ruleType: "",
-  ruleId: "",
+  ruleType: null,
+  ruleId: null,
   // rule attributes for this rule ID is fetched and 'mapping' object must be built
   // mapping: {}
 };
@@ -70,6 +67,53 @@ const BusinessRuleMapper = ({ isNew = false }: { isNew: boolean }) => {
                   {...getFieldProps("businessEventRuleId")}
                 />
               )}
+              <Autocomplete
+                fullWidth
+                value={values.ruleType as any}
+                onChange={(event: any, newValue: any | null) => {
+                  setFieldValue("ruleType", newValue);
+                  if (!newValue) {
+                    setFieldValue("ruleId", newValue);
+                    // reset the mapping as well
+                  } else {
+                    // trigger a GET call and get all ruleIds for this type /ruleIds?ruleType=<string> API
+                  }
+                }}
+                options={RuleTypes} // fetched asynchronously; maybe elastic search
+                getOptionLabel={({ id, name }: { id: string; name: string }) =>
+                  `${id} : ${name}`
+                }
+                renderInput={(params: any) => (
+                  <TextField
+                    {...params}
+                    required
+                    label="Rule Type"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                )}
+              />
+              <Autocomplete
+                fullWidth
+                value={values.ruleId as any}
+                onChange={(event: any, newValue: any | null) => {
+                  setFieldValue("ruleId", newValue);
+                  // trigger a GET call and get the rule for this ruleId /rule?ruleId=<string> API
+                }}
+                options={MockRuleIds} // fetched asynchronously;
+                renderInput={(params: any) => (
+                  <TextField
+                    {...params}
+                    required
+                    label="Rule Id"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                )}
+                disabled={!values.ruleType}
+              />
             </Form>
           );
         }}

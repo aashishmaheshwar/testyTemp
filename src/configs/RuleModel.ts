@@ -31,3 +31,9 @@ export const RuleInitialValues = {
     attributes: [{ name: "", type: "", id: Math.random() }],
 };
   
+export const RuleTypes = [
+    { id: "REG", name: "Regular" },
+    { id: "ACC", name: "Account" },
+];
+
+export const MockRuleIds = ['R00001733', 'R00001734', 'R00001735'];
