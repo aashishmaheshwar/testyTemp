@@ -3,14 +3,7 @@ import { Autocomplete } from "@material-ui/lab";
 import { Form, Formik } from "formik";
 import React from "react";
 import { MockRuleIds, RuleTypes } from "../configs/RuleModel";
-
-const initialValues = {
-  businessEventRuleId: "",
-  ruleType: null,
-  ruleId: null,
-  // rule attributes for this rule ID is fetched and 'mapping' object must be built
-  // mapping: {}
-};
+import { BusinessRuleMapperInitialValues } from "../configs/RuleMapper";
 
 const BusinessRuleMapper = ({ isNew = false }: { isNew: boolean }) => {
   return (
@@ -21,7 +14,7 @@ const BusinessRuleMapper = ({ isNew = false }: { isNew: boolean }) => {
           : "Show/Edit Business Event Rule"}
       </Typography>
       <Formik
-        initialValues={initialValues}
+        initialValues={BusinessRuleMapperInitialValues}
         // validationSchema={RuleModelValidationSchema}
         onSubmit={(values, { resetForm, setSubmitting }) => {
           setSubmitting(true);
