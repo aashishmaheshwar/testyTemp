@@ -27,5 +27,20 @@ export const BusinessRuleMapperInitialValues: BusinessRuleMapper = {
   ruleType: null,
   ruleId: null,
   // rule attributes for this rule ID is fetched and 'mapping' object must be built
-  mapping: [{ attributeName: "" }],
+  mapping: [
+    {
+      attributeName: "abc",
+    },
+    {
+      attributeName: "testFunc",
+      type: "function",
+      functionName: "translFunc",
+      functionArgs: ["val1", "val2"],
+    },
+    {
+      attributeName: "testVal",
+      type: "value",
+      mappedTo: "val3",
+    },
+  ],
 };

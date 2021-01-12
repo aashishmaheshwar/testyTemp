@@ -1,37 +1,85 @@
 import React, { useEffect, useState } from "react";
 import { FieldArray, getIn, FormikProps } from "formik";
 import { BusinessRuleMapper, RuleAttributeMap } from "../configs/RuleMapper";
+import {
+  Box,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from "@material-ui/core";
+import { useRuleModelStyles } from "./RuleModelStyles";
 
 type RuleMapperProps = {
-  ruleId: string;
   formikProps: FormikProps<BusinessRuleMapper>;
-  mappedData?: Array<RuleAttributeMap>;
 };
 
-const RuleMapper = ({ ruleId, mappedData, formikProps }: RuleMapperProps) => {
-  const [data, setData] = useState<Array<RuleAttributeMap>>([
-    // for testing
-    {
-      attributeName: "abc",
-    },
-    {
-      attributeName: "testFunc",
-      type: "function",
-      functionName: "translFunc",
-      functionArgs: ["val1", "val2"],
-    },
-    {
-      attributeName: "testVal",
-      type: "value",
-      mappedTo: "val3",
-    },
-  ]);
+const RuleMapper = ({ formikProps }: RuleMapperProps) => {
+  const { values, errors, touched, getFieldProps, setFieldValue } = formikProps;
+  const classes = useRuleModelStyles();
 
-  useEffect(() => {
-    // fetch the rule attributes here and transform it and setData here
-  }, [ruleId]);
+  return (
+    <>
+      <h4>Rule Mapping</h4>
+      <FieldArray name="mapping">
+        {({}) => {
+          return (
+            <>
+              <Box className={classes.attributeWrapper}>
+                {values.mapping.map((attribute, idx) => {
+                  const attributeName = `mapping[${idx}].attributeName`;
 
-  return <div>{data.map((attr, idx) => {})}</div>;
+                  const type = `mapping[${idx}].type`;
+                  const touchedType = getIn(touched, type);
+                  const errorType = getIn(errors, type);
+
+                  const onAttributeTypeChange = (event: any) => {
+                    const { value } = event.target;
+                    switch (value) {
+                      case "function":
+                        // setFieldValue(vals, []);
+                        break;
+                      case "value":
+                        // setFieldValue(length, "");
+                        break;
+                    }
+                    setFieldValue(type, value);
+                  };
+
+                  return (
+                    <Box key={idx}>
+                      <TextField
+                        margin="dense"
+                        label="Attribute Name"
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
+                        value={getFieldProps(attributeName).value}
+                      />
+                      <FormControl error={Boolean(touchedType && errorType)}>
+                        <InputLabel shrink id={type}>
+                          Type
+                        </InputLabel>
+                        <Select
+                          labelId={type}
+                          {...getFieldProps(type)}
+                          onChange={onAttributeTypeChange}
+                        >
+                          <MenuItem value={"function"}>Function</MenuItem>
+                          <MenuItem value={"value"}>Value</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+                  );
+                })}
+              </Box>
+            </>
+          );
+        }}
+      </FieldArray>
+    </>
+  );
 };
 
 export default RuleMapper;

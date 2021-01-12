@@ -4,6 +4,7 @@ import { Form, Formik } from "formik";
 import React from "react";
 import { MockRuleIds, RuleTypes } from "../configs/RuleModel";
 import { BusinessRuleMapperInitialValues } from "../configs/RuleMapper";
+import RuleMapper from "./RuleMapper";
 
 const BusinessRuleMapper = ({ isNew = false }: { isNew: boolean }) => {
   return (
@@ -93,6 +94,7 @@ const BusinessRuleMapper = ({ isNew = false }: { isNew: boolean }) => {
                 onChange={(event: any, newValue: any | null) => {
                   setFieldValue("ruleId", newValue);
                   // trigger a GET call and get the rule for this ruleId /rule?ruleId=<string> API
+                  // setFieldValue("mapping", the array returned);
                 }}
                 options={MockRuleIds} // fetched asynchronously;
                 renderInput={(params: any) => (
@@ -107,6 +109,9 @@ const BusinessRuleMapper = ({ isNew = false }: { isNew: boolean }) => {
                 )}
                 disabled={!values.ruleType}
               />
+              {values.mapping?.length && (
+                <RuleMapper formikProps={formikProps} />
+              )}
             </Form>
           );
         }}
