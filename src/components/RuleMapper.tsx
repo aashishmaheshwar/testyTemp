@@ -9,15 +9,27 @@ import {
   Select,
   TextField,
 } from "@material-ui/core";
-import { useRuleModelStyles } from "./RuleModelStyles";
+import { useRuleMapperStyles } from "./RuleMapperStyles";
+import { Autocomplete } from "@material-ui/lab";
+import { TradeAttributes } from "../types/Trade";
 
 type RuleMapperProps = {
   formikProps: FormikProps<BusinessRuleMapper>;
 };
 
+// options are based on the tradeId associated.
+const options: Array<string> = [...TradeAttributes];
+
+// standard functions - sample here
+const functionOptions: Array<string> = [
+  "COMM-Fn-MapSide",
+  "COMM-Fn-Amount",
+  "RefData-GetAccount",
+];
+
 const RuleMapper = ({ formikProps }: RuleMapperProps) => {
   const { values, errors, touched, getFieldProps, setFieldValue } = formikProps;
-  const classes = useRuleModelStyles();
+  const classes = useRuleMapperStyles();
 
   return (
     <>
@@ -34,11 +46,24 @@ const RuleMapper = ({ formikProps }: RuleMapperProps) => {
                   const touchedType = getIn(touched, type);
                   const errorType = getIn(errors, type);
 
+                  const functionArgs = `mapping[${idx}].functionArgs`;
+                  const touchedFunctionArgs = getIn(touched, functionArgs);
+                  const errorFunctionArgs = getIn(errors, functionArgs);
+
+                  const functionName = `mapping[${idx}].functionName`;
+                  const touchedFunctionName = getIn(touched, functionName);
+                  const errorFunctionName = getIn(errors, functionName);
+
+                  const mappedTo = `mapping[${idx}].mappedTo`;
+                  const touchedMappedTo = getIn(touched, mappedTo);
+                  const errorMappedTo = getIn(errors, mappedTo);
+
                   const onAttributeTypeChange = (event: any) => {
                     const { value } = event.target;
                     switch (value) {
                       case "function":
-                        // setFieldValue(vals, []);
+                        setFieldValue(functionName, "");
+                        setFieldValue(functionArgs, []);
                         break;
                       case "value":
                         // setFieldValue(length, "");
@@ -70,6 +95,82 @@ const RuleMapper = ({ formikProps }: RuleMapperProps) => {
                           <MenuItem value={"value"}>Value</MenuItem>
                         </Select>
                       </FormControl>
+                      {/* mappedTo */}
+                      {getFieldProps(type).value === "value" && (
+                        <Autocomplete
+                          freeSolo
+                          classes={{
+                            root: `${classes.acRoot} ${classes.mappedToRoot}`,
+                            input: classes.acInput,
+                          }}
+                          options={options}
+                          {...getFieldProps(mappedTo)}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="Mapped to Property"
+                              margin="dense"
+                              InputLabelProps={{
+                                shrink: true,
+                              }}
+                              error={Boolean(touchedMappedTo && errorMappedTo)}
+                            />
+                          )}
+                        />
+                      )}
+                      {/* functionName and functionArgs */}
+                      {getFieldProps(type).value === "function" && (
+                        <>
+                          <Autocomplete
+                            freeSolo
+                            classes={{
+                              root: classes.acRoot,
+                              input: classes.acInput,
+                            }}
+                            options={functionOptions}
+                            {...getFieldProps(functionName)}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                label="Function Name"
+                                margin="dense"
+                                InputLabelProps={{
+                                  shrink: true,
+                                }}
+                                error={Boolean(
+                                  touchedFunctionName && errorFunctionName
+                                )}
+                              />
+                            )}
+                          />
+                          <Autocomplete
+                            freeSolo
+                            multiple
+                            classes={{
+                              root: `${classes.acRoot} ${classes.argsRoot}`,
+                              input: classes.acInput,
+                            }}
+                            options={options}
+                            {...getFieldProps(functionArgs)}
+                            onChange={(e, value) => {
+                              setFieldValue(functionArgs, value);
+                            }}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                label="Function arguements"
+                                margin="dense"
+                                InputLabelProps={{
+                                  shrink: true,
+                                }}
+                                error={Boolean(
+                                  touchedFunctionArgs && errorFunctionArgs
+                                )}
+                              />
+                            )}
+                          />
+                        </>
+                      )}
                     </Box>
                   );
                 })}

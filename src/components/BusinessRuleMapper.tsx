@@ -1,4 +1,4 @@
-import { Box, TextField, Typography } from "@material-ui/core";
+import { Box, TextField, Typography, Button } from "@material-ui/core";
 import { Autocomplete } from "@material-ui/lab";
 import { Form, Formik } from "formik";
 import React from "react";
@@ -112,6 +112,11 @@ const BusinessRuleMapper = ({ isNew = false }: { isNew: boolean }) => {
               {values.mapping?.length && (
                 <RuleMapper formikProps={formikProps} />
               )}
+              <Box>
+                <Button color="primary" type="submit" disabled={isSubmitting}>
+                  Submit
+                </Button>
+              </Box>
             </Form>
           );
         }}
