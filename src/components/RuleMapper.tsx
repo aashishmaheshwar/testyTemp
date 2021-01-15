@@ -93,6 +93,7 @@ const RuleMapper = ({ formikProps }: RuleMapperProps) => {
                         <Select
                           labelId={type}
                           {...getFieldProps(type)}
+                          required
                           onChange={onAttributeTypeChange}
                         >
                           <MenuItem value={"function"}>Function</MenuItem>
