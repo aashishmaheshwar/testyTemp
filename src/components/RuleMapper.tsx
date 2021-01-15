@@ -8,6 +8,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  FormHelperText,
 } from "@material-ui/core";
 import { useRuleMapperStyles } from "./RuleMapperStyles";
 import { Autocomplete } from "@material-ui/lab";
@@ -64,9 +65,12 @@ const RuleMapper = ({ formikProps }: RuleMapperProps) => {
                       case "function":
                         setFieldValue(functionName, "");
                         setFieldValue(functionArgs, []);
+                        setFieldValue(mappedTo, undefined);
                         break;
                       case "value":
-                        // setFieldValue(length, "");
+                        setFieldValue(mappedTo, "");
+                        setFieldValue(functionName, undefined);
+                        setFieldValue(functionArgs, undefined);
                         break;
                     }
                     setFieldValue(type, value);
@@ -94,6 +98,9 @@ const RuleMapper = ({ formikProps }: RuleMapperProps) => {
                           <MenuItem value={"function"}>Function</MenuItem>
                           <MenuItem value={"value"}>Value</MenuItem>
                         </Select>
+                        {touchedType && errorType && (
+                          <FormHelperText>{errorType}</FormHelperText>
+                        )}
                       </FormControl>
                       {/* mappedTo */}
                       {getFieldProps(type).value === "value" && (
@@ -105,6 +112,12 @@ const RuleMapper = ({ formikProps }: RuleMapperProps) => {
                           }}
                           options={options}
                           {...getFieldProps(mappedTo)}
+                          onInputChange={(e, value) => {
+                            setFieldValue(mappedTo, value);
+                          }}
+                          onChange={(e, value) => {
+                            setFieldValue(mappedTo, value || "");
+                          }}
                           renderInput={(params) => (
                             <TextField
                               {...params}
@@ -114,6 +127,7 @@ const RuleMapper = ({ formikProps }: RuleMapperProps) => {
                                 shrink: true,
                               }}
                               error={Boolean(touchedMappedTo && errorMappedTo)}
+                              helperText={touchedMappedTo && errorMappedTo}
                             />
                           )}
                         />
@@ -129,6 +143,12 @@ const RuleMapper = ({ formikProps }: RuleMapperProps) => {
                             }}
                             options={functionOptions}
                             {...getFieldProps(functionName)}
+                            onInputChange={(e, value) => {
+                              setFieldValue(functionName, value);
+                            }}
+                            onChange={(e, value) => {
+                              setFieldValue(functionName, value || "");
+                            }}
                             renderInput={(params) => (
                               <TextField
                                 {...params}
@@ -140,6 +160,9 @@ const RuleMapper = ({ formikProps }: RuleMapperProps) => {
                                 error={Boolean(
                                   touchedFunctionName && errorFunctionName
                                 )}
+                                helperText={
+                                  touchedFunctionName && errorFunctionName
+                                }
                               />
                             )}
                           />
@@ -166,6 +189,9 @@ const RuleMapper = ({ formikProps }: RuleMapperProps) => {
                                 error={Boolean(
                                   touchedFunctionArgs && errorFunctionArgs
                                 )}
+                                helperText={
+                                  touchedFunctionArgs && errorFunctionArgs
+                                }
                               />
                             )}
                           />

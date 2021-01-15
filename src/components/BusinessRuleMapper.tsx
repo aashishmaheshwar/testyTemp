@@ -3,7 +3,10 @@ import { Autocomplete } from "@material-ui/lab";
 import { Form, Formik } from "formik";
 import React from "react";
 import { MockRuleIds, RuleTypes } from "../configs/RuleModel";
-import { BusinessRuleMapperInitialValues } from "../configs/RuleMapper";
+import {
+  BusinessRuleMapperInitialValues,
+  RuleMapperValidationSchema,
+} from "../configs/RuleMapper";
 import RuleMapper from "./RuleMapper";
 
 const BusinessRuleMapper = ({ isNew = false }: { isNew: boolean }) => {
@@ -16,7 +19,7 @@ const BusinessRuleMapper = ({ isNew = false }: { isNew: boolean }) => {
       </Typography>
       <Formik
         initialValues={BusinessRuleMapperInitialValues}
-        // validationSchema={RuleModelValidationSchema}
+        validationSchema={RuleMapperValidationSchema}
         onSubmit={(values, { resetForm, setSubmitting }) => {
           setSubmitting(true);
           const {
@@ -109,7 +112,7 @@ const BusinessRuleMapper = ({ isNew = false }: { isNew: boolean }) => {
                 )}
                 disabled={!values.ruleType}
               />
-              {values.mapping?.length && (
+              {getFieldProps("ruleId").value && values.mapping?.length && (
                 <RuleMapper formikProps={formikProps} />
               )}
               <Box>
