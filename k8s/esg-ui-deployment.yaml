@@ -15,10 +15,8 @@ spec:
         app: esg-ui-service
     spec:
       containers:
-        image: gcr.io/esg-trade-enabler/trading-message-service-subhajit
+      - image: gcr.io/esg-trade-enabler/esg-ui
         name: esg-ui-service
         ports:
         - containerPort: 8080
-      - name: cloud-sql-proxy
-        image: gcr.io/esg-trade-enabler/esg-ui
       restartPolicy: Always
