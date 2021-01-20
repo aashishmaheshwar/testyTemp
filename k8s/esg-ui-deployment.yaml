@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: esg-ui-service
+  name: esg-ui-service
+spec:
+  replicas: 1
+  selector:
+      matchLabels:
+        app: esg-ui-service
+  template:
+    metadata:
+      labels:
+        app: esg-ui-service
+    spec:
+      containers:
+        image: gcr.io/esg-trade-enabler/trading-message-service-subhajit
+        name: esg-ui-service
+        ports:
+        - containerPort: 8080
+      - name: cloud-sql-proxy
+        image: gcr.io/esg-trade-enabler/esg-ui
+      restartPolicy: Always
