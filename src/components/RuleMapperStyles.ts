@@ -9,7 +9,7 @@ export const useRuleMapperStyles = makeStyles((theme: Theme) =>
       marginBottom: "20px",
       "& > div": {
         display: "flex",
-        placeItems: "end",
+        placeItems: "flex-end",
         "& > div": {
           "&.MuiFormControl-root": {
             flex: 1,

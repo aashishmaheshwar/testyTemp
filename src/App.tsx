@@ -2,7 +2,7 @@ import React, { Suspense } from "react";
 import "./App.css";
 import MainNav from "./components/MainNav";
 import {
-  BrowserRouter as Router,
+  HashRouter as Router,
   Redirect,
   Route,
   Switch,
