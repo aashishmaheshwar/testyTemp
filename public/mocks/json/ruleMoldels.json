@@ -1,0 +1,20 @@
+[
+    {
+        "ruleId": "R00001733",
+        "ruleName": "IB DATA LAKE - MiFID 2 ORK",
+        "ruleType": "REG",
+        "attributes": [
+            { "name": "dr_cr_flag", "type": "ENUM", "id": "abcde", "values": ["DR", "CR"]},
+            { "name": "currency", "type": "CHAR", "id": "abxde", "length": "3" }
+        ]
+    },
+    {
+        "ruleId": "R00001734",
+        "ruleName": "IV DATA LAKE - MiFID 2 ORK",
+        "ruleType": "ACC",
+        "attributes": [
+            { "name": "quantity", "type": "DECIMAL", "id": "abcde", "length": "21,9" },
+            { "name": "value_date", "type": "DATE", "id": "abxde" }
+        ]
+    }
+]

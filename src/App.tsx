@@ -2,15 +2,17 @@ import React, { Suspense } from "react";
 import "./App.css";
 import MainNav from "./components/MainNav";
 import {
-  HashRouter as Router,
+  BrowserRouter as Router,
   Redirect,
   Route,
   Switch,
 } from "react-router-dom";
-import Trades from "./components/Trades";
-import BusinessEvents from "./components/BusinessEvents";
-import RuleModel from "./components/RuleModel";
-import BusinessRuleMapper from "./components/BusinessRuleMapper";
+const Trades = React.lazy(() => import("./components/Trades"));
+const BusinessEvents = React.lazy(() => import("./components/BusinessEvents"));
+const RuleModel = React.lazy(() => import("./components/RuleModel"));
+const BusinessRuleMapper = React.lazy(
+  () => import("./components/BusinessRuleMapper")
+);
 
 function App() {
   return (
