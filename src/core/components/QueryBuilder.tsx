@@ -28,14 +28,20 @@ const useStyles = makeStyles({
   },
 });
 
-const RuleQueryBuilder = ({ buildConfig, onTriggerCondition }: any) => {
+const RuleQueryBuilder = ({
+  buildConfig,
+  onTriggerCondition,
+  condition,
+}: any) => {
   const classes = useStyles();
   const [config, setConfig] = useState({
     ...InitialConfig,
     ...buildConfig,
   });
   const [tree, setTree] = useState(
-    QbUtils.checkTree(QbUtils.loadTree(queryValue as any), config)
+    condition
+      ? QbUtils.loadFromJsonLogic(condition, config)
+      : QbUtils.checkTree(QbUtils.loadTree(queryValue as any), config)
   );
 
   const renderBuilder = (props: any) => (
@@ -53,22 +59,22 @@ const RuleQueryBuilder = ({ buildConfig, onTriggerCondition }: any) => {
     // Tip: for better performance you can apply `throttle` - see `examples/demo`
     setTree(immutableTree);
     setConfig(newConfig);
-    const triggerCondition = QbUtils.queryString(immutableTree, newConfig);
-    onTriggerCondition(triggerCondition || "");
+    const triggerCondition = QbUtils.jsonLogicFormat(immutableTree, newConfig);
+    onTriggerCondition(triggerCondition.logic || "");
 
     // const jsonTree = QbUtils.getTree(immutableTree);
     // console.log(jsonTree);
     // `jsonTree` can be saved to backend, and later loaded to `queryValue`
   };
 
-  const renderResult = () => (
-    <div className="query-builder-result">
-      <div>
-        Query string:{" "}
-        <pre>{JSON.stringify(QbUtils.queryString(tree, config))}</pre>
-      </div>
-    </div>
-  );
+  // const renderResult = () => (
+  //   <div className="query-builder-result">
+  //     <div>
+  //       Query string:{" "}
+  //       <pre>{JSON.stringify(QbUtils.jsonLogicFormat(tree, config))}</pre>
+  //     </div>
+  //   </div>
+  // );
 
   return (
     <div className={classes.root}>
