@@ -1,4 +1,13 @@
-import { Box, TextField, Typography, Button } from "@material-ui/core";
+import {
+  Box,
+  TextField,
+  Typography,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+} from "@material-ui/core";
 import { Autocomplete } from "@material-ui/lab";
 import { Form, Formik } from "formik";
 import React from "react";
@@ -9,16 +18,52 @@ import {
 } from "../configs/RuleMapper";
 import RuleMapper from "./RuleMapper";
 
-const BusinessRuleMapper = ({ isNew = false }: { isNew: boolean }) => {
+const updateBusinessRuleMapper = (event: any): any => {
+  return {
+    ...event,
+    ruleType: {
+      ...RuleTypes.find(({ id }) => id === event.ruleType),
+    },
+  };
+};
+
+type BusinessRuleProps = {
+  isNew?: boolean;
+  open?: boolean;
+  event?: any;
+  onClose: any;
+};
+
+const BusinessRuleMapper = ({
+  isNew = false,
+  open = false,
+  event,
+  onClose,
+}: BusinessRuleProps) => {
   return (
-    <Box width="80%" margin="auto">
+    <Dialog
+      open={open}
+      onClose={onClose}
+      aria-labelledby="business-event-rule-details-dialog"
+      maxWidth="lg"
+    >
+      <DialogTitle id="business-event-rule-details-dialog">
+        {isNew
+          ? "Create new Business Event Rule"
+          : "Show/Edit Business Event Rule"}
+      </DialogTitle>
+      {/* <Box width="80%" margin="auto">
       <Typography variant="h6" component="h6">
         {isNew
           ? "Create new Business Event Rule"
           : "Show/Edit Business Event Rule"}
-      </Typography>
+      </Typography> */}
       <Formik
-        initialValues={BusinessRuleMapperInitialValues}
+        initialValues={
+          isNew
+            ? BusinessRuleMapperInitialValues
+            : updateBusinessRuleMapper({ ...event })
+        }
         validationSchema={RuleMapperValidationSchema}
         onSubmit={(values, { resetForm, setSubmitting }) => {
           setSubmitting(true);
@@ -35,6 +80,7 @@ const BusinessRuleMapper = ({ isNew = false }: { isNew: boolean }) => {
           alert(JSON.stringify(postData, null, 2));
           resetForm();
           setSubmitting(false);
+          onClose();
         }}
       >
         {(formikProps) => {
@@ -52,79 +98,90 @@ const BusinessRuleMapper = ({ isNew = false }: { isNew: boolean }) => {
 
           return (
             <Form>
-              {!isNew && (
-                <TextField
-                  margin="dense"
-                  label="Business Event Rule Id"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
+              <DialogContent>
+                <DialogContentText>
+                  {isNew
+                    ? `To create a new business event rule enter the below information.`
+                    : `Update details to modify an existing business event rule`}
+                </DialogContentText>
+                {!isNew && (
+                  <TextField
+                    margin="dense"
+                    label="Business Event Rule Id"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    fullWidth
+                    disabled
+                    {...getFieldProps("businessEventRuleId")}
+                  />
+                )}
+                <Autocomplete
                   fullWidth
-                  disabled
-                  {...getFieldProps("businessEventRuleId")}
+                  value={values.ruleType as any}
+                  onChange={(event: any, newValue: any | null) => {
+                    setFieldValue("ruleType", newValue);
+                    if (!newValue) {
+                      setFieldValue("ruleId", newValue);
+                      // reset the mapping as well
+                    } else {
+                      // trigger a GET call and get all ruleIds for this type /ruleIds?ruleType=<string> API
+                    }
+                  }}
+                  options={RuleTypes} // fetched asynchronously; maybe elastic search
+                  getOptionLabel={({
+                    id,
+                    name,
+                  }: {
+                    id: string;
+                    name: string;
+                  }) => `${id} : ${name}`}
+                  renderInput={(params: any) => (
+                    <TextField
+                      {...params}
+                      required
+                      label="Rule Type"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                    />
+                  )}
                 />
-              )}
-              <Autocomplete
-                fullWidth
-                value={values.ruleType as any}
-                onChange={(event: any, newValue: any | null) => {
-                  setFieldValue("ruleType", newValue);
-                  if (!newValue) {
+                <Autocomplete
+                  fullWidth
+                  value={values.ruleId as any}
+                  onChange={(event: any, newValue: any | null) => {
                     setFieldValue("ruleId", newValue);
-                    // reset the mapping as well
-                  } else {
-                    // trigger a GET call and get all ruleIds for this type /ruleIds?ruleType=<string> API
-                  }
-                }}
-                options={RuleTypes} // fetched asynchronously; maybe elastic search
-                getOptionLabel={({ id, name }: { id: string; name: string }) =>
-                  `${id} : ${name}`
-                }
-                renderInput={(params: any) => (
-                  <TextField
-                    {...params}
-                    required
-                    label="Rule Type"
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                  />
+                    // trigger a GET call and get the rule for this ruleId /rule?ruleId=<string> API
+                    // setFieldValue("mapping", the array returned);
+                  }}
+                  options={MockRuleIds} // fetched asynchronously;
+                  renderInput={(params: any) => (
+                    <TextField
+                      {...params}
+                      required
+                      label="Rule Id"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                    />
+                  )}
+                  disabled={!values.ruleType}
+                />
+                {getFieldProps("ruleId").value && values.mapping?.length && (
+                  <RuleMapper formikProps={formikProps} />
                 )}
-              />
-              <Autocomplete
-                fullWidth
-                value={values.ruleId as any}
-                onChange={(event: any, newValue: any | null) => {
-                  setFieldValue("ruleId", newValue);
-                  // trigger a GET call and get the rule for this ruleId /rule?ruleId=<string> API
-                  // setFieldValue("mapping", the array returned);
-                }}
-                options={MockRuleIds} // fetched asynchronously;
-                renderInput={(params: any) => (
-                  <TextField
-                    {...params}
-                    required
-                    label="Rule Id"
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                  />
-                )}
-                disabled={!values.ruleType}
-              />
-              {getFieldProps("ruleId").value && values.mapping?.length && (
-                <RuleMapper formikProps={formikProps} />
-              )}
-              <Box>
-                <Button color="primary" type="submit" disabled={isSubmitting}>
-                  Submit
-                </Button>
-              </Box>
+                <Box>
+                  <Button color="primary" type="submit" disabled={isSubmitting}>
+                    Submit
+                  </Button>
+                </Box>
+              </DialogContent>
             </Form>
           );
         }}
       </Formik>
-    </Box>
+    </Dialog>
   );
 };
 

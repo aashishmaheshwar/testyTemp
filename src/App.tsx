@@ -10,9 +10,7 @@ import {
 const Trades = React.lazy(() => import("./components/Trades"));
 const BusinessEvents = React.lazy(() => import("./components/BusinessEvents"));
 const Rules = React.lazy(() => import("./components/Rules"));
-const BusinessRuleMapper = React.lazy(
-  () => import("./components/BusinessRuleMapper")
-);
+const BusinessRules = React.lazy(() => import("./components/BusinessRules"));
 
 function App() {
   return (
@@ -35,9 +33,7 @@ function App() {
               <Route
                 path="/businessRuleMapper"
                 exact
-                render={(props) => (
-                  <BusinessRuleMapper {...props} isNew={true} />
-                )}
+                render={() => <BusinessRules />}
               />
               <Route path="**" exact>
                 <Redirect to="/tradeModel" />

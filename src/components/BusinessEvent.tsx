@@ -111,6 +111,7 @@ const BusinessEvent = ({
       open={open}
       onClose={onClose}
       aria-labelledby="business-event-details-dialog"
+      maxWidth="lg"
     >
       <DialogTitle id="business-event-details-dialog">
         {isNew ? "Create new Business Event" : "Show/Edit Business Event"}

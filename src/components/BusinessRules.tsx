@@ -8,9 +8,9 @@ import Box from "@material-ui/core/Box";
 import { makeStyles } from "@material-ui/core/styles";
 import React, { useState } from "react";
 import { StyledTableCell, StyledTableRow } from "./../core/Table";
-import BusinessEvent from "./BusinessEvent";
 import { Button } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
+import BusinessRuleMapper from "./BusinessRuleMapper";
 
 const useStyles = makeStyles({
   table: {
@@ -43,44 +43,28 @@ const useStyles = makeStyles({
 
 const mockAPIData = [
   {
-    businessEventId: "BE0001",
-    businessEventName: "event A",
-    tradeModelId: "TM000028",
-    triggerCondition: {
-      and: [
-        {
-          "==": [
-            {
-              var: "CumQty",
-            },
-            4,
-          ],
-        },
-      ],
-    },
-  },
-  {
-    businessEventId: "BE0002",
-    businessEventName: "event B",
-    tradeModelId: "TM000027",
-    triggerCondition: {
-      and: [
-        {
-          "==": [
-            {
-              var: "LeavesQty",
-            },
-            2,
-          ],
-        },
-      ],
-    },
+    businessEventRuleId: "BER0000786",
+    ruleType: "ACC",
+    ruleId: "R00001734",
+    mapping: [
+      {
+        attributeName: "dr_cr_flag",
+        type: "function",
+        functionName: "COMM-Fn-MapSide",
+        functionArgs: ["Side", "LastQty"],
+      },
+      {
+        attributeName: "entry_date",
+        type: "value",
+        mappedTo: "TrdDt",
+      },
+    ],
   },
 ];
 
-const BusinessEvents = () => {
+const BusinessRules = () => {
   const classes = useStyles();
-  const [selectedEvent, setSelectedEvent] = useState<
+  const [selectedBusinessEventRule, setSelectedBusinessEventRule] = useState<
     typeof mockAPIData[0] | null
   >(null);
   const [open, setOpen] = useState(false);
@@ -89,17 +73,17 @@ const BusinessEvents = () => {
 
   return (
     <Box>
-      {selectedEvent && (
-        <BusinessEvent
-          open={!!selectedEvent}
-          event={selectedEvent}
+      {selectedBusinessEventRule && (
+        <BusinessRuleMapper
+          open={!!selectedBusinessEventRule}
+          event={selectedBusinessEventRule}
           onClose={() => {
-            setSelectedEvent(null);
+            setSelectedBusinessEventRule(null);
           }}
         />
       )}
       {open && (
-        <BusinessEvent
+        <BusinessRuleMapper
           isNew
           open
           onClose={() => {
@@ -114,47 +98,36 @@ const BusinessEvents = () => {
           size="small"
           onClick={() => setOpen(true)}
         >
-          + New Business Event
+          + New Business Event Rule
         </Button>
       </Box>
       <Box>
         <TableContainer component={Paper}>
-          <Table className={classes.table} aria-label="Business Events">
+          <Table className={classes.table} aria-label="Business Event Rules">
             <TableHead>
               <TableRow>
-                <StyledTableCell>Business Event ID</StyledTableCell>
-                <StyledTableCell>Business Event Name</StyledTableCell>
-                <StyledTableCell>Trade Model ID</StyledTableCell>
+                <StyledTableCell>Business Event Rule ID</StyledTableCell>
+                <StyledTableCell>Rule Type</StyledTableCell>
+                <StyledTableCell>Rule Id</StyledTableCell>
                 <StyledTableCell>Edit / Show</StyledTableCell>
-                <StyledTableCell>Rules</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {rows.map((row) => (
-                <StyledTableRow key={row.businessEventId}>
+                <StyledTableRow key={row.businessEventRuleId}>
                   <StyledTableCell component="th" scope="row">
-                    {row.businessEventId}
+                    {row.businessEventRuleId}
                   </StyledTableCell>
-                  <StyledTableCell>{row.businessEventName}</StyledTableCell>
-                  <StyledTableCell>{row.tradeModelId}</StyledTableCell>
+                  <StyledTableCell>{row.ruleType}</StyledTableCell>
+                  <StyledTableCell>{row.ruleId}</StyledTableCell>
                   <StyledTableCell>
                     <Button
                       color="primary"
                       variant="outlined"
                       size="small"
-                      onClick={() => setSelectedEvent(row)}
+                      onClick={() => setSelectedBusinessEventRule(row)}
                     >
                       Show/ Edit Details
-                    </Button>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                    <Button
-                      color="primary"
-                      variant="outlined"
-                      size="small"
-                      onClick={() => history.push("/businessRuleMapper")}
-                    >
-                      Create/ Show rules
                     </Button>
                   </StyledTableCell>
                 </StyledTableRow>
@@ -167,4 +140,4 @@ const BusinessEvents = () => {
   );
 };
 
-export default BusinessEvents;
+export default BusinessRules;
