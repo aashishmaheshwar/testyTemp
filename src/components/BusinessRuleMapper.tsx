@@ -21,6 +21,16 @@ import RuleMapper from "./RuleMapper";
 const updateBusinessRuleMapper = (event: any): any => {
   return {
     ...event,
+    mapping: event.mapping.map((obj: any) => {
+      const newObj = { ...obj };
+      if (newObj.type === "function") {
+        newObj.functionArgs = [...obj.properties];
+      } else {
+        newObj.mappedTo = obj?.properties[0];
+      }
+      delete newObj.properties;
+      return newObj;
+    }),
     ruleType: {
       ...RuleTypes.find(({ id }) => id === event.ruleType),
     },
@@ -70,7 +80,18 @@ const BusinessRuleMapper = ({
           const {
             ruleType: { id: ruleType },
           } = values as any;
-          let postData: any = { ...values, ruleType };
+          const mapping = values.mapping.map((obj: any) => {
+            const newObj = { ...obj };
+            if (newObj.type === "function") {
+              newObj.properties = [...obj.functionArgs];
+              delete newObj.functionArgs;
+            } else {
+              newObj.properties = [obj.mappedTo];
+              delete newObj.mappedTo;
+            }
+            return newObj;
+          });
+          let postData: any = { ...values, mapping, ruleType };
           if (isNew) {
             delete postData.businessEventRuleId;
           }

@@ -48,15 +48,17 @@ const mockAPIData = [
     ruleId: "R00001734",
     mapping: [
       {
+        businessEventRuleMappingId: "BERM00001",
         attributeName: "dr_cr_flag",
         type: "function",
         functionName: "COMM-Fn-MapSide",
-        functionArgs: ["Side", "LastQty"],
+        properties: ["Side", "LastQty"], // functionArgs
       },
       {
+        businessEventRuleMappingId: "BERM00002",
         attributeName: "entry_date",
         type: "value",
-        mappedTo: "TrdDt",
+        properties: ["TrdDt"], // mappedTo
       },
     ],
   },

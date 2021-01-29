@@ -316,7 +316,7 @@ const Trades = () => {
           size="small"
           onClick={handleClickOpen}
         >
-          + New Trade
+          + New Trade Model
         </Button>
       </Box>
       <Box>
