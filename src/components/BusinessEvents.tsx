@@ -152,7 +152,11 @@ const BusinessEvents = () => {
                       color="primary"
                       variant="outlined"
                       size="small"
-                      onClick={() => history.push("/businessRuleMapper")}
+                      onClick={() =>
+                        history.push(
+                          `/businessRuleMapper?businessEventId=${row.businessEventId}`
+                        )
+                      }
                     >
                       Create/ Show rules
                     </Button>
