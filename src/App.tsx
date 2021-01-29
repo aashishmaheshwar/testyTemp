@@ -9,7 +9,7 @@ import {
 } from "react-router-dom";
 const Trades = React.lazy(() => import("./components/Trades"));
 const BusinessEvents = React.lazy(() => import("./components/BusinessEvents"));
-const RuleModel = React.lazy(() => import("./components/RuleModel"));
+const Rules = React.lazy(() => import("./components/Rules"));
 const BusinessRuleMapper = React.lazy(
   () => import("./components/BusinessRuleMapper")
 );
@@ -31,11 +31,7 @@ function App() {
                 exact
                 render={() => <BusinessEvents />}
               />
-              <Route
-                path="/ruleModel"
-                exact
-                render={(props) => <RuleModel {...props} isNew={true} />}
-              />
+              <Route path="/ruleModel" exact render={() => <Rules />} />
               <Route
                 path="/businessRuleMapper"
                 exact

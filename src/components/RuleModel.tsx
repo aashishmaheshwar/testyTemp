@@ -1,7 +1,14 @@
 import React from "react";
 import Box from "@material-ui/core/Box";
 import { Formik, Form } from "formik";
-import { Button, TextField, Typography } from "@material-ui/core";
+import {
+  Button,
+  TextField,
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@material-ui/core";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import {
   RuleInitialValues,
@@ -11,16 +18,42 @@ import {
 import RuleAttributeContainer from "./RuleAttributeContainer";
 import { useRuleModelStyles } from "./RuleModelStyles";
 
-const RuleModel = ({ isNew = false }: { isNew: boolean }) => {
+const updateRuleObj = (event: any): any => {
+  return {
+    ...event,
+    ruleType: {
+      ...RuleTypes.find(({ id }) => id === event.ruleType),
+    },
+  };
+};
+
+type RuleModelProps = {
+  isNew?: boolean;
+  open?: boolean;
+  event?: any;
+  onClose: any;
+};
+
+const RuleModel = ({
+  isNew = false,
+  open = false,
+  onClose,
+  event,
+}: RuleModelProps) => {
   const classes = useRuleModelStyles();
 
   return (
-    <Box width="80%" margin="auto">
-      <Typography variant="h6" component="h6">
+    <Dialog
+      open={open}
+      onClose={onClose}
+      aria-labelledby="rule-details-dialog"
+      maxWidth="lg"
+    >
+      <DialogTitle id="rule-details-dialog">
         {isNew ? "Create new Rule" : "Show/Edit Rule"}
-      </Typography>
+      </DialogTitle>
       <Formik
-        initialValues={RuleInitialValues}
+        initialValues={isNew ? RuleInitialValues : updateRuleObj({ ...event })}
         validationSchema={RuleModelValidationSchema}
         onSubmit={(values, { resetForm, setSubmitting }) => {
           setSubmitting(true);
@@ -37,6 +70,7 @@ const RuleModel = ({ isNew = false }: { isNew: boolean }) => {
           alert(JSON.stringify(postData, null, 2));
           resetForm();
           setSubmitting(false);
+          onClose();
         }}
       >
         {(formikProps) => {
@@ -54,67 +88,78 @@ const RuleModel = ({ isNew = false }: { isNew: boolean }) => {
 
           return (
             <Form>
-              {!isNew && (
+              <DialogContent>
+                <DialogContentText>
+                  {isNew
+                    ? `To create a new rule enter the below information.`
+                    : `Update details to modify an existing rule`}
+                </DialogContentText>
+                {!isNew && (
+                  <TextField
+                    margin="dense"
+                    label="Rule Id"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    fullWidth
+                    disabled
+                    {...getFieldProps("ruleId")}
+                  />
+                )}
+                <Autocomplete
+                  // id="combo-box-demo"
+                  fullWidth
+                  value={values.ruleType as any}
+                  onChange={(event: any, newValue: any | null) => {
+                    setFieldValue("ruleType", newValue);
+                  }}
+                  options={RuleTypes} // fetched asynchronously; maybe elastic search
+                  getOptionLabel={({
+                    id,
+                    name,
+                  }: {
+                    id: string;
+                    name: string;
+                  }) => `${id} : ${name}`}
+                  renderInput={(params: any) => (
+                    <TextField
+                      {...params}
+                      required
+                      label="Rule Type"
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                    />
+                  )}
+                />
+                <br />
                 <TextField
+                  required
                   margin="dense"
-                  label="Rule Id"
+                  label="Rule Name"
                   InputLabelProps={{
                     shrink: true,
                   }}
                   fullWidth
-                  disabled
-                  {...getFieldProps("ruleId")}
+                  {...getFieldProps("ruleName")}
+                  error={touched.ruleName && Boolean(errors.ruleName)}
+                  helperText={touched.ruleName && errors.ruleName}
+                  className={classes.ruleName}
                 />
-              )}
-              <Autocomplete
-                // id="combo-box-demo"
-                fullWidth
-                value={values.ruleType as any}
-                onChange={(event: any, newValue: any | null) => {
-                  setFieldValue("ruleType", newValue);
-                }}
-                options={RuleTypes} // fetched asynchronously; maybe elastic search
-                getOptionLabel={({ id, name }: { id: string; name: string }) =>
-                  `${id} : ${name}`
-                }
-                renderInput={(params: any) => (
-                  <TextField
-                    {...params}
-                    required
-                    label="Rule Type"
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                  />
-                )}
-              />
-              <br />
-              <TextField
-                required
-                margin="dense"
-                label="Rule Name"
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                fullWidth
-                {...getFieldProps("ruleName")}
-                error={touched.ruleName && Boolean(errors.ruleName)}
-                helperText={touched.ruleName && errors.ruleName}
-                className={classes.ruleName}
-              />
-              <br />
-              {/* placeholder for adding rule attributes */}
-              <RuleAttributeContainer formikProps={formikProps} />
-              <Box>
-                <Button color="primary" type="submit" disabled={isSubmitting}>
-                  Submit
-                </Button>
-              </Box>
+                <br />
+                {/* placeholder for adding rule attributes */}
+                <RuleAttributeContainer formikProps={formikProps} />
+                <Box>
+                  <Button color="primary" type="submit" disabled={isSubmitting}>
+                    Submit
+                  </Button>
+                </Box>
+              </DialogContent>
             </Form>
           );
         }}
       </Formik>
-    </Box>
+    </Dialog>
   );
 };
 

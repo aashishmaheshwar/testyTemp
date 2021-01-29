@@ -2,6 +2,15 @@ import { createStyles, makeStyles, Theme } from "@material-ui/core";
 
 export const useRuleModelStyles = makeStyles((theme: Theme) =>
   createStyles({
+    root: {
+      display: "flex",
+      justifyContent: "center",
+      flexWrap: "wrap",
+      listStyle: "none",
+      padding: "5px",
+      margin: 0,
+      marginTop: "8px",
+    },
     ruleName: {
       marginBottom: "15px",
     },
@@ -13,7 +22,7 @@ export const useRuleModelStyles = makeStyles((theme: Theme) =>
       "& > div": {
         display: "flex",
         "& > ul": {
-          flex: 4
+          flex: 4,
         },
         "& > div": {
           "&.MuiFormControl-root": {
