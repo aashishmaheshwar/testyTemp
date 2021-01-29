@@ -8,7 +8,7 @@ import {
   Switch,
 } from "react-router-dom";
 const Trades = React.lazy(() => import("./components/Trades"));
-const BusinessEvent = React.lazy(() => import("./components/BusinessEvent"));
+const BusinessEvents = React.lazy(() => import("./components/BusinessEvents"));
 const RuleModel = React.lazy(() => import("./components/RuleModel"));
 const BusinessRuleMapper = React.lazy(
   () => import("./components/BusinessRuleMapper")
@@ -29,7 +29,7 @@ function App() {
               <Route
                 path="/businessEvent"
                 exact
-                render={(props) => <BusinessEvent {...props} isNew={true} />}
+                render={() => <BusinessEvents />}
               />
               <Route
                 path="/ruleModel"
