@@ -9,12 +9,10 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Input,
   InputLabel,
   makeStyles,
   TextField,
   Tooltip,
-  Typography,
 } from "@material-ui/core";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import HelpIcon from "@material-ui/icons/Help";
@@ -53,13 +51,25 @@ const useStyles = makeStyles({
   },
 });
 
-const tradeModels = [{ id: "TM000027", name: "XP Investments - Equity" }];
+const tradeModels = [
+  { id: "TM000027", name: "XP Investments - Equity" },
+  { id: "TM000028", name: "XP Investments - Real Estate" },
+];
 
 type BusinessEventProps = {
   isNew?: boolean;
   open?: boolean;
   event?: any;
   onClose: any;
+};
+
+const updateTradeModelObj = (event: any): any => {
+  return {
+    ...event,
+    tradeModelId: {
+      ...tradeModels.find(({ id }) => id === event.tradeModelId),
+    },
+  };
 };
 
 const BusinessEvent = ({
@@ -79,7 +89,7 @@ const BusinessEvent = ({
           tradeModelId: null,
           triggerCondition: "",
         }
-      : { ...event },
+      : updateTradeModelObj({ ...event }),
     validationSchema: BusinessEventValidationSchema,
     // validateOnBlur: false,
     onSubmit: (values) => {
@@ -91,7 +101,8 @@ const BusinessEvent = ({
         delete postData.businessEventId;
       }
       alert(JSON.stringify(postData, null, 2));
-      history.push("/businessRuleMapper");
+      // history.push("/businessRuleMapper");
+      onClose();
     },
   });
 
@@ -104,10 +115,6 @@ const BusinessEvent = ({
       <DialogTitle id="business-event-details-dialog">
         {isNew ? "Create new Business Event" : "Show/Edit Business Event"}
       </DialogTitle>
-      {/* <Box width="80%" margin="auto">
-      <Typography variant="h6" component="h6">
-        {isNew ? "Create new Business Event" : "Show/Edit Business Event"}
-      </Typography> */}
       <form onSubmit={formik.handleSubmit}>
         <DialogContent>
           <DialogContentText>
@@ -233,7 +240,7 @@ const BusinessEvent = ({
           />
           <Box>
             <Button color="primary" type="submit">
-              Next
+              Save
             </Button>
           </Box>
         </DialogContent>

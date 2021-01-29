@@ -10,6 +10,7 @@ import React, { useState } from "react";
 import { StyledTableCell, StyledTableRow } from "./../core/Table";
 import BusinessEvent from "./BusinessEvent";
 import { Button } from "@material-ui/core";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles({
   table: {
@@ -44,15 +45,15 @@ const mockAPIData = [
   {
     businessEventId: "BE0001",
     businessEventName: "event A",
-    tradeModelId: "TM00037",
+    tradeModelId: "TM000028",
     triggerCondition: {
       and: [
         {
           "==": [
             {
-              var: "LeavesQty",
+              var: "CumQty",
             },
-            2,
+            4,
           ],
         },
       ],
@@ -61,7 +62,7 @@ const mockAPIData = [
   {
     businessEventId: "BE0002",
     businessEventName: "event B",
-    tradeModelId: "TM00038",
+    tradeModelId: "TM000027",
     triggerCondition: {
       and: [
         {
@@ -79,8 +80,12 @@ const mockAPIData = [
 
 const BusinessEvents = () => {
   const classes = useStyles();
-  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState<
+    typeof mockAPIData[0] | null
+  >(null);
   const [open, setOpen] = useState(false);
+  const [rows, setRows] = useState(mockAPIData);
+  const history = useHistory();
 
   return (
     <Box>
@@ -121,9 +126,40 @@ const BusinessEvents = () => {
                 <StyledTableCell>Business Event Name</StyledTableCell>
                 <StyledTableCell>Trade Model ID</StyledTableCell>
                 <StyledTableCell>Edit / Show</StyledTableCell>
+                <StyledTableCell>Rules</StyledTableCell>
               </TableRow>
             </TableHead>
-            <TableBody></TableBody>
+            <TableBody>
+              {rows.map((row) => (
+                <StyledTableRow key={row.businessEventId}>
+                  <StyledTableCell component="th" scope="row">
+                    {row.businessEventId}
+                  </StyledTableCell>
+                  <StyledTableCell>{row.businessEventName}</StyledTableCell>
+                  <StyledTableCell>{row.tradeModelId}</StyledTableCell>
+                  <StyledTableCell>
+                    <Button
+                      color="primary"
+                      variant="outlined"
+                      size="small"
+                      onClick={() => setSelectedEvent(row)}
+                    >
+                      Show/ Edit Details
+                    </Button>
+                  </StyledTableCell>
+                  <StyledTableCell>
+                    <Button
+                      color="primary"
+                      variant="outlined"
+                      size="small"
+                      onClick={() => history.push("/businessRuleMapper")}
+                    >
+                      Create/Show rules
+                    </Button>
+                  </StyledTableCell>
+                </StyledTableRow>
+              ))}
+            </TableBody>
           </Table>
         </TableContainer>
       </Box>
