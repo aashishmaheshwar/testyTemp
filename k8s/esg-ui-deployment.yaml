@@ -7,16 +7,16 @@ metadata:
 spec:
   replicas: 1
   selector:
-      matchLabels:
-        app: esg-ui-service
+    matchLabels:
+      app: esg-ui-service
   template:
     metadata:
       labels:
         app: esg-ui-service
     spec:
       containers:
-      - image: gcr.io/esg-trade-enabler/esg-ui
-        name: esg-ui-service
-        ports:
-        - containerPort: 8080
+        - image: gcr.io/esg-trade-enabler/esg-ui:latest
+          name: esg-ui-service
+          ports:
+            - containerPort: 8080
       restartPolicy: Always
