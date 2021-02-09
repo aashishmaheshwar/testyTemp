@@ -29,6 +29,7 @@ import TradeModel from "./TradeModel";
 import { useFormik } from "formik";
 import { TradeModelValidationSchema } from "../configs/TradeModel";
 import { FormHelperText } from "@material-ui/core";
+import { Autocomplete } from "@material-ui/lab";
 
 function createData(
   tradeModelId: string,
@@ -89,32 +90,33 @@ const Trades = () => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [selectedTrade, setSelectedTrade] = useState(null as any);
-  const [selectedAttrs, setSelectedAttrs] = useState(
-    new Set<AttributeType | string>()
-  );
+  // const [selectedAttrs, setSelectedAttrs] = useState(
+  //   new Set<AttributeType | string>()
+  // );
   const [allAttributes, setAllAttributes] = useState(
     new Set<AttributeType | string>(TradeAttributes)
   );
-  const [chipInputVal, setChipInputVal] = useState("");
+  // const [chipInputVal, setChipInputVal] = useState("");
 
   const formik = useFormik({
     initialValues: {
       tradeModelName: "",
       tradeChannelName: "",
+      attributes: [],
     },
     validationSchema: TradeModelValidationSchema,
     onSubmit: (values) => {
-      alert(
-        JSON.stringify(
-          { ...values, attributes: Array.from(selectedAttrs) },
-          null,
-          2
-        )
-      );
-      if (selectedAttrs.size) {
-        // make the API call here - await
-        handleClose();
-      }
+      // alert(
+      //   JSON.stringify(
+      //     { ...values, attributes: Array.from(selectedAttrs) },
+      //     null,
+      //     2
+      //   )
+      // );
+      // if (selectedAttrs.size) {
+      //   // make the API call here - await
+      handleClose();
+      // }
     },
   });
 
@@ -123,52 +125,52 @@ const Trades = () => {
   };
 
   const handleClose = () => {
-    setSelectedAttrs(new Set());
+    // setSelectedAttrs(new Set());
     formik.resetForm();
     setOpen(false);
-    setAllAttributes(new Set(TradeAttributes));
+    // setAllAttributes(new Set(TradeAttributes));
   };
 
-  const handleDelete = (attr: string) => {
-    setSelectedAttrs((oldAttrs) => {
-      oldAttrs.delete(attr);
-      return new Set([...Array.from(oldAttrs)]);
-    });
-  };
+  // const handleDelete = (attr: string) => {
+  //   setSelectedAttrs((oldAttrs) => {
+  //     oldAttrs.delete(attr);
+  //     return new Set([...Array.from(oldAttrs)]);
+  //   });
+  // };
 
-  const handleClick = (attr: string) => {
-    if (selectedAttrs.has(attr)) {
-      handleDelete(attr);
-      return;
-    }
-    setSelectedAttrs((oldAttrs) => {
-      return new Set([...Array.from(oldAttrs), attr]);
-    });
-  };
+  // const handleClick = (attr: string) => {
+  //   if (selectedAttrs.has(attr)) {
+  //     handleDelete(attr);
+  //     return;
+  //   }
+  //   setSelectedAttrs((oldAttrs) => {
+  //     return new Set([...Array.from(oldAttrs), attr]);
+  //   });
+  // };
 
   const isDisabled = (): boolean => {
-    if (!selectedAttrs.size) {
-      return true;
-    }
+    // if (!selectedAttrs.size) {
+    //   return true;
+    // }
     return !(formik.dirty && formik.isValid);
   };
 
-  const chipInputOnKeyPress = (e: any) => {
-    if (e.key === "Enter" || e.keyCode === 13) {
-      e.preventDefault();
-      setSelectedAttrs((oldAttrs) => {
-        return new Set([...Array.from(oldAttrs), chipInputVal]);
-      });
-      setAllAttributes((oldAttrs) => {
-        return new Set([...Array.from(oldAttrs), chipInputVal]);
-      });
-      setChipInputVal("");
-    }
-  };
+  // const chipInputOnKeyPress = (e: any) => {
+  //   if (e.key === "Enter" || e.keyCode === 13) {
+  //     e.preventDefault();
+  //     setSelectedAttrs((oldAttrs) => {
+  //       return new Set([...Array.from(oldAttrs), chipInputVal]);
+  //     });
+  //     setAllAttributes((oldAttrs) => {
+  //       return new Set([...Array.from(oldAttrs), chipInputVal]);
+  //     });
+  //     setChipInputVal("");
+  //   }
+  // };
 
-  const chipInputOnChange = (e: any) => {
-    setChipInputVal(e.target.value.trim());
-  };
+  // const chipInputOnChange = (e: any) => {
+  //   setChipInputVal(e.target.value.trim());
+  // };
 
   const buildFormDetails = () => {
     return (
@@ -227,7 +229,34 @@ const Trades = () => {
                 formik.errors.tradeChannelName
               }
             />
-            <InputLabel
+            <Autocomplete
+              multiple
+              id="attributesId"
+              options={Array.from(allAttributes)}
+              // name="attributes"
+              value={formik.values.attributes}
+              onChange={formik.handleChange}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  margin="dense"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  variant="standard"
+                  label="Trade Attributes"
+                  placeholder="Add Attributes"
+                  onBlur={formik.handleBlur}
+                  error={!formik.values.attributes.length && formik.dirty}
+                  helperText={
+                    !formik.values.attributes.length && formik.dirty
+                      ? "Atleast one attribute must be selected"
+                      : ""
+                  }
+                />
+              )}
+            />
+            {/* <InputLabel
               required
               shrink={true}
               classes={{
@@ -282,7 +311,7 @@ const Trades = () => {
               <FormHelperText error={formik.dirty}>
                 Atleast one attribute must be selected
               </FormHelperText>
-            )}
+            )} */}
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose} color="primary">

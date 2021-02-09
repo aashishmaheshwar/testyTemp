@@ -4,9 +4,10 @@ import "react-awesome-query-builder/lib/css/compact_styles.css"; //optional, for
 
 import { Query, Builder, Utils as QbUtils } from "react-awesome-query-builder";
 
-// For Material-UI widgets only:
-import MaterialConfig from "react-awesome-query-builder/lib/config/material";
 import { makeStyles } from "@material-ui/core";
+// For Material-UI widgets only:
+const MaterialConfig = require("react-awesome-query-builder/lib/config/material");
+
 // Choose your skin (ant/material/vanilla):
 const InitialConfig = MaterialConfig; // or MaterialConfig or BasicConfig
 
