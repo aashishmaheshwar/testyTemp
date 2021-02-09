@@ -106,13 +106,7 @@ const Trades = () => {
     },
     validationSchema: TradeModelValidationSchema,
     onSubmit: (values) => {
-      // alert(
-      //   JSON.stringify(
-      //     { ...values, attributes: Array.from(selectedAttrs) },
-      //     null,
-      //     2
-      //   )
-      // );
+      alert(JSON.stringify(values, null, 2));
       // if (selectedAttrs.size) {
       //   // make the API call here - await
       handleClose();
@@ -233,9 +227,8 @@ const Trades = () => {
               multiple
               id="attributesId"
               options={Array.from(allAttributes)}
-              // name="attributes"
               value={formik.values.attributes}
-              onChange={formik.handleChange}
+              onChange={(e, value) => formik.setFieldValue("attributes", value)}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -244,7 +237,7 @@ const Trades = () => {
                     shrink: true,
                   }}
                   variant="standard"
-                  label="Trade Attributes"
+                  label="Trade Attributes*"
                   placeholder="Add Attributes"
                   onBlur={formik.handleBlur}
                   error={!formik.values.attributes.length && formik.dirty}
