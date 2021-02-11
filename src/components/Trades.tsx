@@ -18,17 +18,10 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 
 import { StyledTableCell, StyledTableRow } from "./../core/Table";
-import Chip from "@material-ui/core/Chip";
-import DoneIcon from "@material-ui/icons/Done";
-import HelpIcon from "@material-ui/icons/Help";
-import InputLabel from "@material-ui/core/InputLabel/InputLabel";
-import Tooltip from "@material-ui/core/Tooltip";
-import Input from "@material-ui/core/Input";
 import { AttributeType, TradeAttributes } from "./../types/Trade";
 import TradeModel from "./TradeModel";
 import { useFormik } from "formik";
 import { TradeModelValidationSchema } from "../configs/TradeModel";
-import { FormHelperText } from "@material-ui/core";
 import { Autocomplete } from "@material-ui/lab";
 
 function createData(
@@ -90,13 +83,9 @@ const Trades = () => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [selectedTrade, setSelectedTrade] = useState(null as any);
-  // const [selectedAttrs, setSelectedAttrs] = useState(
-  //   new Set<AttributeType | string>()
-  // );
   const [allAttributes, setAllAttributes] = useState(
     new Set<AttributeType | string>(TradeAttributes)
   );
-  // const [chipInputVal, setChipInputVal] = useState("");
 
   const formik = useFormik({
     initialValues: {
@@ -107,10 +96,7 @@ const Trades = () => {
     validationSchema: TradeModelValidationSchema,
     onSubmit: (values) => {
       alert(JSON.stringify(values, null, 2));
-      // if (selectedAttrs.size) {
-      //   // make the API call here - await
       handleClose();
-      // }
     },
   });
 
@@ -119,52 +105,13 @@ const Trades = () => {
   };
 
   const handleClose = () => {
-    // setSelectedAttrs(new Set());
     formik.resetForm();
     setOpen(false);
-    // setAllAttributes(new Set(TradeAttributes));
   };
-
-  // const handleDelete = (attr: string) => {
-  //   setSelectedAttrs((oldAttrs) => {
-  //     oldAttrs.delete(attr);
-  //     return new Set([...Array.from(oldAttrs)]);
-  //   });
-  // };
-
-  // const handleClick = (attr: string) => {
-  //   if (selectedAttrs.has(attr)) {
-  //     handleDelete(attr);
-  //     return;
-  //   }
-  //   setSelectedAttrs((oldAttrs) => {
-  //     return new Set([...Array.from(oldAttrs), attr]);
-  //   });
-  // };
 
   const isDisabled = (): boolean => {
-    // if (!selectedAttrs.size) {
-    //   return true;
-    // }
     return !(formik.dirty && formik.isValid);
   };
-
-  // const chipInputOnKeyPress = (e: any) => {
-  //   if (e.key === "Enter" || e.keyCode === 13) {
-  //     e.preventDefault();
-  //     setSelectedAttrs((oldAttrs) => {
-  //       return new Set([...Array.from(oldAttrs), chipInputVal]);
-  //     });
-  //     setAllAttributes((oldAttrs) => {
-  //       return new Set([...Array.from(oldAttrs), chipInputVal]);
-  //     });
-  //     setChipInputVal("");
-  //   }
-  // };
-
-  // const chipInputOnChange = (e: any) => {
-  //   setChipInputVal(e.target.value.trim());
-  // };
 
   const buildFormDetails = () => {
     return (
@@ -249,62 +196,6 @@ const Trades = () => {
                 />
               )}
             />
-            {/* <InputLabel
-              required
-              shrink={true}
-              classes={{
-                root: classes.attributeLabel,
-              }}
-              error={!selectedAttrs.size && formik.dirty}
-            >
-              Trade Attributes&nbsp;
-              <Tooltip title="Select atleast one attribute">
-                <HelpIcon />
-              </Tooltip>
-              &nbsp;
-            </InputLabel>
-            <Paper component="ul" className={classes.root} elevation={3}>
-              {Array.from(allAttributes).map((attribute, idx) => {
-                return (
-                  <li key={idx}>
-                    <Chip
-                      label={attribute}
-                      clickable
-                      variant="outlined"
-                      color={
-                        selectedAttrs.has(attribute) ? "primary" : undefined
-                      }
-                      onClick={() => handleClick(attribute)}
-                      onDelete={
-                        selectedAttrs.has(attribute)
-                          ? () => handleDelete(attribute)
-                          : undefined
-                      }
-                      deleteIcon={
-                        selectedAttrs.has(attribute) ? <DoneIcon /> : undefined
-                      }
-                      className={classes.chip}
-                    />
-                  </li>
-                );
-              })}
-              <li>
-                <Input
-                  classes={{
-                    root: classes.attributeInputBlur,
-                    focused: classes.attributeInputFocus,
-                  }}
-                  onKeyPress={chipInputOnKeyPress}
-                  value={chipInputVal}
-                  onChange={chipInputOnChange}
-                />
-              </li>
-            </Paper>
-            {!selectedAttrs.size && (
-              <FormHelperText error={formik.dirty}>
-                Atleast one attribute must be selected
-              </FormHelperText>
-            )} */}
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose} color="primary">
