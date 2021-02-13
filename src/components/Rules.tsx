@@ -10,7 +10,29 @@ import React, { useState } from "react";
 import { StyledTableCell, StyledTableRow } from "./../core/Table";
 import { Button } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
+import createRuleModelMutation from "./RuleModel";
+import { env } from "../core/Environment";
+import axios from "axios";
+import { useQuery } from "react-query";
 import RuleModel from "./RuleModel";
+
+export const getRuleTypes = async () => {
+  const { data } = await axios.get(env.apiHostName + env.apis.getRuleTypes);
+  return data;
+};
+
+export const getRuleIdsForRuleType = async (type: string) => {
+  const { data } = await axios.get(
+    `${env.apiHostName}/${env.apis.getRuleIdsForRuleType}/?type=${type}`
+  );
+  return data;
+};
+
+const getRuleModels = async () => {
+  const { data: ruleTypes } = await getRuleTypes();
+  // ruleTypes.map(({id}) => id) do parallel get to fetch all ids, then get all rules
+  return;
+};
 
 const useStyles = makeStyles({
   table: {
@@ -76,6 +98,7 @@ const mockAPIData = [
 
 const Rules = () => {
   const classes = useStyles();
+  // const rows = useQuery('ruleModels', getRuleModels);
   const [selectedRule, setSelectedRule] = useState<
     typeof mockAPIData[0] | null
   >(null);
