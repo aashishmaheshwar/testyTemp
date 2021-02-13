@@ -23,15 +23,40 @@ export const getRuleTypes = async () => {
 
 export const getRuleIdsForRuleType = async (type: string) => {
   const { data } = await axios.get(
-    `${env.apiHostName}/${env.apis.getRuleIdsForRuleType}/?type=${type}`
+    `${env.apiHostName}/${env.apis.getRuleIdsForRuleType}/?ruleType=${type}`
+  );
+  return data;
+};
+
+export const getRuleModelForRuleId = async (id: string) => {
+  const { data } = await axios.get(
+    `${env.apiHostName}/${env.apis.getRuleModel}/?ruleId=${id}`
   );
   return data;
 };
 
 const getRuleModels = async () => {
-  const { data: ruleTypes } = await getRuleTypes();
+  const ruleTypes = await getRuleTypes();
   // ruleTypes.map(({id}) => id) do parallel get to fetch all ids, then get all rules
-  return;
+  const ids = ((await axios
+    .all(
+      (ruleTypes as Array<{ id: string }>).map(({ id }) =>
+        getRuleIdsForRuleType(id)
+      )
+    )
+    .then(
+      axios.spread((...responses) => {
+        return responses;
+      })
+    )) as Array<any>).flat();
+  const data = ((await axios
+    .all((ids as Array<string>).map((id) => getRuleModelForRuleId(id)))
+    .then(
+      axios.spread((...responses) => {
+        return responses.map((item, idx) => ({ ...item, ruleId: ids[idx] }));
+      })
+    )) as Array<any>).flat();
+  return data;
 };
 
 const useStyles = makeStyles({
@@ -98,12 +123,17 @@ const mockAPIData = [
 
 const Rules = () => {
   const classes = useStyles();
-  // const rows = useQuery('ruleModels', getRuleModels);
+  const {
+    data: rows,
+    isFetching: isRuleModelsFetching,
+    status,
+    error,
+  } = useQuery("ruleModels", getRuleModels);
   const [selectedRule, setSelectedRule] = useState<
     typeof mockAPIData[0] | null
   >(null);
   const [open, setOpen] = useState(false);
-  const [rows, setRows] = useState(mockAPIData);
+  // const [rows, setRows] = useState(mockAPIData);
   const history = useHistory();
 
   return (
@@ -137,39 +167,45 @@ const Rules = () => {
         </Button>
       </Box>
       <Box>
-        <TableContainer component={Paper}>
-          <Table className={classes.table} aria-label="Rules">
-            <TableHead>
-              <TableRow>
-                <StyledTableCell>Rule ID</StyledTableCell>
-                <StyledTableCell>Rule Name</StyledTableCell>
-                <StyledTableCell>Rule Type</StyledTableCell>
-                <StyledTableCell>Edit / Show</StyledTableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row) => (
-                <StyledTableRow key={row.ruleId}>
-                  <StyledTableCell component="th" scope="row">
-                    {row.ruleId}
-                  </StyledTableCell>
-                  <StyledTableCell>{row.ruleName}</StyledTableCell>
-                  <StyledTableCell>{row.ruleType}</StyledTableCell>
-                  <StyledTableCell>
-                    <Button
-                      color="primary"
-                      variant="outlined"
-                      size="small"
-                      onClick={() => setSelectedRule(row)}
-                    >
-                      Show/ Edit Details
-                    </Button>
-                  </StyledTableCell>
-                </StyledTableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        {isRuleModelsFetching ? (
+          "Loading"
+        ) : status === "error" ? (
+          <span>Error: {(error as any)?.message}</span>
+        ) : (
+          <TableContainer component={Paper}>
+            <Table className={classes.table} aria-label="Rules">
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell>Rule ID</StyledTableCell>
+                  <StyledTableCell>Rule Name</StyledTableCell>
+                  <StyledTableCell>Rule Type</StyledTableCell>
+                  <StyledTableCell>Edit / Show</StyledTableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {(rows || []).map((row) => (
+                  <StyledTableRow key={row.ruleId}>
+                    <StyledTableCell component="th" scope="row">
+                      {row.ruleId}
+                    </StyledTableCell>
+                    <StyledTableCell>{row.ruleName}</StyledTableCell>
+                    <StyledTableCell>{row.ruleType}</StyledTableCell>
+                    <StyledTableCell>
+                      <Button
+                        color="primary"
+                        variant="outlined"
+                        size="small"
+                        onClick={() => setSelectedRule(row)}
+                      >
+                        Show/ Edit Details
+                      </Button>
+                    </StyledTableCell>
+                  </StyledTableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </Box>
     </Box>
   );

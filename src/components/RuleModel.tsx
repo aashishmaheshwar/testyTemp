@@ -74,11 +74,9 @@ const RuleModel = ({
   const updateRuleObj = (event: any): any => {
     return {
       ...event,
-      ruleType: {
-        ...((ruleTypes as Array<{ id: string; name: string }>) || []).find(
-          ({ id }) => id === event.ruleType
-        ),
-      },
+      ruleType: ((ruleTypes as Array<{ id: string; name: string }>) || []).find(
+        ({ id }) => id === event.ruleType
+      ),
     };
   };
 
