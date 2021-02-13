@@ -12,6 +12,18 @@ import { AttributeType, Trade, TradeAttributes } from "./../types/Trade";
 import { TradeModelValidationSchema } from "../configs/TradeModel";
 import { useFormik } from "formik";
 import { Autocomplete } from "@material-ui/lab";
+import { useMutation, useQueryClient } from "react-query";
+import { env } from "../core/Environment";
+import axios from "axios";
+import { getAttributes } from "./Trades";
+
+const updateTradeModel = async (value: Trade) => {
+  const { data } = await axios.put(
+    env.apiHostName + env.apis.updateTradeModel,
+    value
+  );
+  return data;
+};
 
 const TradeModel: React.FC<{
   open: boolean;
@@ -19,8 +31,27 @@ const TradeModel: React.FC<{
   trade: Trade;
 }> = ({ open, onClose, trade }) => {
   const [allAttributes, setAllAttributes] = useState(
-    new Set<AttributeType | string>([...TradeAttributes, ...trade.attributes])
+    new Set<AttributeType | string>([])
   );
+  const queryClient = useQueryClient();
+  // Mutations
+  const tradeModelMutation = useMutation(updateTradeModel, {
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries("tradeModels");
+    },
+  });
+  const getAttributesMutation = useMutation(getAttributes, {
+    onSuccess: (value) => {
+      // console.log("resonse from get attr", value);
+      setAllAttributes(new Set(value));
+      formik.setFieldError("sampleFile", "");
+    },
+    onError: (error) => {
+      setAllAttributes(new Set([]));
+      formik.setFieldError("sampleFile", (error as any).message);
+    },
+  });
 
   const formik = useFormik({
     initialValues: {
@@ -28,10 +59,13 @@ const TradeModel: React.FC<{
       tradeModelName: trade.tradeModelName,
       tradeChannelName: trade.tradeChannelName,
       attributes: trade.attributes,
+      sampleFile: "",
     },
     validationSchema: TradeModelValidationSchema,
     onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
+      // alert(JSON.stringify(values, null, 2));
+      const { sampleFile, ...rest } = values;
+      tradeModelMutation.mutate(rest as any);
       onClose();
     },
   });
@@ -107,9 +141,38 @@ const TradeModel: React.FC<{
               formik.touched.tradeChannelName && formik.errors.tradeChannelName
             }
           />
+          <TextField
+            type="file"
+            fullWidth
+            name="sampleFile"
+            margin="dense"
+            label="Upload a sample trade to fetch the attributes"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            required
+            onChange={(e) => {
+              // console.log("file is ", (e.target as any).files[0]);
+              // make post call here to http://35.236.18.89/model-design/api/v1/readXml
+              getAttributesMutation.mutate((e.target as any).files[0]);
+              // until API starts working
+              // setAllAttributes(new Set(TradeAttributes));
+            }}
+            error={Boolean(formik.errors.sampleFile)}
+            helperText={
+              allAttributes?.size
+                ? formik.errors.sampleFile
+                  ? "Upload call failed"
+                  : "Sample Trade uploaded successfully"
+                : formik.errors.sampleFile
+                ? "Upload call failed"
+                : ""
+            }
+          />
           <Autocomplete
             multiple
             id="attributesId"
+            disabled={!allAttributes.size}
             options={Array.from(allAttributes)}
             value={formik.values.attributes}
             onChange={(e, value) => formik.setFieldValue("attributes", value)}

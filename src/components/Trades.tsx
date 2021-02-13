@@ -18,37 +18,60 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 
 import { StyledTableCell, StyledTableRow } from "./../core/Table";
-import { AttributeType, TradeAttributes } from "./../types/Trade";
+import { AttributeType, Trade, TradeAttributes } from "./../types/Trade";
 import TradeModel from "./TradeModel";
 import { useFormik } from "formik";
 import { TradeModelValidationSchema } from "../configs/TradeModel";
 import { Autocomplete } from "@material-ui/lab";
+import { env } from "../core/Environment";
+import axios from "axios";
+import { useQuery, useMutation, useQueryClient } from "react-query";
 
-function createData(
-  tradeModelId: string,
-  tradeModelName: string,
-  tradeChannelName: string,
-  attributes: Array<AttributeType>
-) {
-  return { tradeModelId, tradeModelName, tradeChannelName, attributes };
-}
+const getTradeModels = async () => {
+  const { data } = await axios.get(env.apiHostName + env.apis.getTradeModels);
+  return data;
+};
 
-const rows = [
-  createData("TM000027", "XP Investments - Equity", "XP Investments - Fix", [
-    "LastMkt",
-    "ExecTyp",
-  ]),
-  createData("TM000028", "MP Investments - Equity", "MP Investments - Fix", [
-    "CumQty",
-    "LeavesQty",
-    "TrdDt",
-  ]),
-  createData("TM000030", "MLM Investments - Forex", "MLM Investments - Fix", [
-    "TxnTM",
-    "LastPX",
-    "LastMkt",
-  ]),
-];
+export const getAttributes = async (file: any) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const { data } = await axios.post(
+    env.apiHostName + env.apis.getAttributes,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return data;
+};
+
+// function createData(
+//   tradeModelId: string,
+//   tradeModelName: string,
+//   tradeChannelName: string,
+//   attributes: Array<AttributeType>
+// ) {
+//   return { tradeModelId, tradeModelName, tradeChannelName, attributes };
+// }
+
+// const rows = [
+//   createData("TM000027", "XP Investments - Equity", "XP Investments - Fix", [
+//     "LastMkt",
+//     "ExecTyp",
+//   ]),
+//   createData("TM000028", "MP Investments - Equity", "MP Investments - Fix", [
+//     "CumQty",
+//     "LeavesQty",
+//     "TrdDt",
+//   ]),
+//   createData("TM000030", "MLM Investments - Forex", "MLM Investments - Fix", [
+//     "TxnTM",
+//     "LastPX",
+//     "LastMkt",
+//   ]),
+// ];
 
 const useStyles = makeStyles({
   table: {
@@ -79,23 +102,59 @@ const useStyles = makeStyles({
   },
 });
 
+const createTradeModel = async (value: Trade) => {
+  const { data } = await axios.post(
+    env.apiHostName + env.apis.createTradeModel,
+    value
+  );
+  return data;
+};
+
 const Trades = () => {
+  const { status, data: rows, error, isFetching } = useQuery(
+    "tradeModels",
+    getTradeModels
+  );
+  const queryClient = useQueryClient();
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [selectedTrade, setSelectedTrade] = useState(null as any);
-  const [allAttributes, setAllAttributes] = useState(
-    new Set<AttributeType | string>(TradeAttributes)
-  );
+  const [allAttributes, setAllAttributes] = useState<
+    Set<AttributeType | string>
+  >(new Set([]) as Set<AttributeType | string>);
+  // Mutations
+  const tradeModelMutation = useMutation(createTradeModel, {
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries("tradeModels");
+    },
+  });
+  const getAttributesMutation = useMutation(getAttributes, {
+    onSuccess: (value) => {
+      // console.log("resonse from get attr", value);
+      setAllAttributes(new Set(value));
+      formik.setFieldError("sampleFile", "");
+    },
+    onError: (error) => {
+      setAllAttributes(new Set([]));
+      formik.setFieldError("sampleFile", (error as any).message);
+    },
+  });
+  // new Set<AttributeType | string>(TradeAttributes)
 
   const formik = useFormik({
     initialValues: {
       tradeModelName: "",
       tradeChannelName: "",
       attributes: [],
+      sampleFile: "",
+      // sampleTrade: ''
     },
     validationSchema: TradeModelValidationSchema,
     onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
+      // alert(JSON.stringify(values, null, 2));
+      const { sampleFile, ...rest } = values;
+      tradeModelMutation.mutate(rest as any);
       handleClose();
     },
   });
@@ -106,6 +165,7 @@ const Trades = () => {
 
   const handleClose = () => {
     formik.resetForm();
+    setAllAttributes(new Set([]));
     setOpen(false);
   };
 
@@ -170,9 +230,38 @@ const Trades = () => {
                 formik.errors.tradeChannelName
               }
             />
+            <TextField
+              type="file"
+              fullWidth
+              name="sampleFile"
+              margin="dense"
+              label="Upload a sample trade to fetch the attributes"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              required
+              onChange={(e) => {
+                // console.log("file is ", (e.target as any).files[0]);
+                // make post call here to http://35.236.18.89/model-design/api/v1/readXml
+                getAttributesMutation.mutate((e.target as any).files[0]);
+                // until API starts working
+                // setAllAttributes(new Set(TradeAttributes));
+              }}
+              error={Boolean(formik.errors.sampleFile)}
+              helperText={
+                allAttributes?.size
+                  ? formik.errors.sampleFile
+                    ? "Upload call failed"
+                    : "Sample Trade uploaded successfully"
+                  : formik.errors.sampleFile
+                  ? "Upload call failed"
+                  : ""
+              }
+            />
             <Autocomplete
               multiple
               id="attributesId"
+              disabled={!allAttributes.size}
               options={Array.from(allAttributes)}
               value={formik.values.attributes}
               onChange={(e, value) => formik.setFieldValue("attributes", value)}
@@ -233,39 +322,45 @@ const Trades = () => {
         </Button>
       </Box>
       <Box>
-        <TableContainer component={Paper}>
-          <Table className={classes.table} aria-label="Trade Models">
-            <TableHead>
-              <TableRow>
-                <StyledTableCell>Trade ID</StyledTableCell>
-                <StyledTableCell>Trade Model Name</StyledTableCell>
-                <StyledTableCell>Trade Channel Name</StyledTableCell>
-                <StyledTableCell>Show Trade Model</StyledTableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row) => (
-                <StyledTableRow key={row.tradeModelId}>
-                  <StyledTableCell component="th" scope="row">
-                    {row.tradeModelId}
-                  </StyledTableCell>
-                  <StyledTableCell>{row.tradeModelName}</StyledTableCell>
-                  <StyledTableCell>{row.tradeChannelName}</StyledTableCell>
-                  <StyledTableCell>
-                    <Button
-                      color="primary"
-                      variant="outlined"
-                      size="small"
-                      onClick={() => setSelectedTrade(row)}
-                    >
-                      Show/ Edit Details
-                    </Button>
-                  </StyledTableCell>
-                </StyledTableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        {isFetching ? (
+          "Loading"
+        ) : status === "error" ? (
+          <span>Error: {(error as any)?.message}</span>
+        ) : (
+          <TableContainer component={Paper}>
+            <Table className={classes.table} aria-label="Trade Models">
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell>Trade ID</StyledTableCell>
+                  <StyledTableCell>Trade Model Name</StyledTableCell>
+                  <StyledTableCell>Trade Channel Name</StyledTableCell>
+                  <StyledTableCell>Show Trade Model</StyledTableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map((row: any) => (
+                  <StyledTableRow key={row.tradeModelId}>
+                    <StyledTableCell component="th" scope="row">
+                      {row.tradeModelId}
+                    </StyledTableCell>
+                    <StyledTableCell>{row.tradeModelName}</StyledTableCell>
+                    <StyledTableCell>{row.tradeChannelName}</StyledTableCell>
+                    <StyledTableCell>
+                      <Button
+                        color="primary"
+                        variant="outlined"
+                        size="small"
+                        onClick={() => setSelectedTrade(row)}
+                      >
+                        Show/ Edit Details
+                      </Button>
+                    </StyledTableCell>
+                  </StyledTableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </Box>
     </Box>
   );
