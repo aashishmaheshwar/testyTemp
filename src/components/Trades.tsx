@@ -8,6 +8,7 @@ import TableBody from "@material-ui/core/TableBody";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
+import { TablePagination } from "@material-ui/core";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
@@ -141,7 +142,6 @@ const Trades = () => {
     },
   });
   // new Set<AttributeType | string>(TradeAttributes)
-
   const formik = useFormik({
     initialValues: {
       tradeModelName: "",
@@ -158,6 +158,19 @@ const Trades = () => {
       handleClose();
     },
   });
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -327,39 +340,54 @@ const Trades = () => {
         ) : status === "error" ? (
           <span>Error: {(error as any)?.message}</span>
         ) : (
-          <TableContainer component={Paper}>
-            <Table className={classes.table} aria-label="Trade Models">
-              <TableHead>
-                <TableRow>
-                  <StyledTableCell>Trade ID</StyledTableCell>
-                  <StyledTableCell>Trade Model Name</StyledTableCell>
-                  <StyledTableCell>Trade Channel Name</StyledTableCell>
-                  <StyledTableCell>Show Trade Model</StyledTableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row: any) => (
-                  <StyledTableRow key={row.tradeModelId}>
-                    <StyledTableCell component="th" scope="row">
-                      {row.tradeModelId}
-                    </StyledTableCell>
-                    <StyledTableCell>{row.tradeModelName}</StyledTableCell>
-                    <StyledTableCell>{row.tradeChannelName}</StyledTableCell>
-                    <StyledTableCell>
-                      <Button
-                        color="primary"
-                        variant="outlined"
-                        size="small"
-                        onClick={() => setSelectedTrade(row)}
-                      >
-                        Show/ Edit Details
-                      </Button>
-                    </StyledTableCell>
-                  </StyledTableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <>
+            <TableContainer component={Paper}>
+              <Table className={classes.table} aria-label="Trade Models">
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell>Trade ID</StyledTableCell>
+                    <StyledTableCell>Trade Model Name</StyledTableCell>
+                    <StyledTableCell>Trade Channel Name</StyledTableCell>
+                    <StyledTableCell>Show Trade Model</StyledTableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row: any) => (
+                      <StyledTableRow key={row.tradeModelId}>
+                        <StyledTableCell component="th" scope="row">
+                          {row.tradeModelId}
+                        </StyledTableCell>
+                        <StyledTableCell>{row.tradeModelName}</StyledTableCell>
+                        <StyledTableCell>
+                          {row.tradeChannelName}
+                        </StyledTableCell>
+                        <StyledTableCell>
+                          <Button
+                            color="primary"
+                            variant="outlined"
+                            size="small"
+                            onClick={() => setSelectedTrade(row)}
+                          >
+                            Show/ Edit Details
+                          </Button>
+                        </StyledTableCell>
+                      </StyledTableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={rows.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onChangePage={handleChangePage}
+              onChangeRowsPerPage={handleChangeRowsPerPage}
+            />
+          </>
         )}
       </Box>
     </Box>
