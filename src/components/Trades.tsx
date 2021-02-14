@@ -8,7 +8,7 @@ import TableBody from "@material-ui/core/TableBody";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
-import { TablePagination } from "@material-ui/core";
+import { TablePagination, Snackbar } from "@material-ui/core";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
@@ -23,7 +23,7 @@ import { AttributeType, Trade, TradeAttributes } from "./../types/Trade";
 import TradeModel from "./TradeModel";
 import { useFormik } from "formik";
 import { TradeModelValidationSchema } from "../configs/TradeModel";
-import { Autocomplete } from "@material-ui/lab";
+import { Autocomplete, Alert } from "@material-ui/lab";
 import { env } from "../core/Environment";
 import axios from "axios";
 import { useQuery, useMutation, useQueryClient } from "react-query";
@@ -123,11 +123,17 @@ const Trades = () => {
   const [allAttributes, setAllAttributes] = useState<
     Set<AttributeType | string>
   >(new Set([]) as Set<AttributeType | string>);
+  const [alertMsg, setAlertMsg] = useState("");
+
   // Mutations
   const tradeModelMutation = useMutation(createTradeModel, {
     onSuccess: () => {
       // Invalidate and refetch
       queryClient.invalidateQueries("tradeModels");
+      setAlertMsg("Saved successfully");
+    },
+    onError: (error) => {
+      setAlertMsg((error as any).message);
     },
   });
   const getAttributesMutation = useMutation(getAttributes, {
@@ -155,7 +161,7 @@ const Trades = () => {
       // alert(JSON.stringify(values, null, 2));
       const { sampleFile, ...rest } = values;
       tradeModelMutation.mutate(rest as any);
-      handleClose();
+      // handleClose();
     },
   });
   const [page, setPage] = React.useState(0);
@@ -184,6 +190,13 @@ const Trades = () => {
 
   const isDisabled = (): boolean => {
     return !(formik.dirty && formik.isValid);
+  };
+
+  const handleAlertClose = () => {
+    if (alertMsg === "Saved successfully") {
+      handleClose();
+    }
+    setAlertMsg("");
   };
 
   const buildFormDetails = () => {
@@ -314,6 +327,19 @@ const Trades = () => {
 
   return (
     <Box>
+      <Snackbar
+        open={!!alertMsg}
+        autoHideDuration={2000}
+        onClose={handleAlertClose}
+        anchorOrigin={{ vertical: "top", horizontal: "left" }}
+      >
+        <Alert
+          onClose={handleAlertClose}
+          severity={alertMsg.includes("success") ? "success" : "error"}
+        >
+          {alertMsg}
+        </Alert>
+      </Snackbar>
       {selectedTrade && (
         <TradeModel
           open={!!selectedTrade}

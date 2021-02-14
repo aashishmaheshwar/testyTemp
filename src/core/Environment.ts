@@ -11,6 +11,7 @@ export const env = {
     getRuleTypes: "model-design/api/v1/rule/types", // get call
     getRuleIdsForRuleType: "model-design/api/v1/rule/ids", // get call
     createRuleModel: "model-design/api/v1/rule", // post call
+    updateRuleModel: "model-design/api/v1/rule", // put call
     getRuleModel: "model-design/api/v1/rule", // get call
   },
 };

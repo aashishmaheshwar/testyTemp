@@ -105,7 +105,7 @@ const RuleAttributeContainer = ({
                   };
 
                   return (
-                    <Box key={attribute.id}>
+                    <Box key={idx}>
                       <TextField
                         margin="dense"
                         label="Name"
