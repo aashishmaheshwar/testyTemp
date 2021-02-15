@@ -6,7 +6,11 @@ import { Query, Builder, Utils as QbUtils } from "react-awesome-query-builder";
 
 import { makeStyles } from "@material-ui/core";
 // For Material-UI widgets only:
-const MaterialConfig = require("react-awesome-query-builder/lib/config/material");
+// const MaterialConfig = require("react-awesome-query-builder/lib/config/material");
+/* eslint-disable */
+// @ts-ignore
+import MaterialConfig from "react-awesome-query-builder/lib/config/material";
+/* eslint-enable */
 
 // Choose your skin (ant/material/vanilla):
 const InitialConfig = MaterialConfig; // or MaterialConfig or BasicConfig
