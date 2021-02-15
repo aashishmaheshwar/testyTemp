@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Box from "@material-ui/core/Box";
 import { useFormik } from "formik";
 import RuleQueryBuilder from "../core/components/QueryBuilder";
@@ -13,11 +13,23 @@ import {
   makeStyles,
   TextField,
   Tooltip,
+  Snackbar,
 } from "@material-ui/core";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import { Autocomplete, Alert } from "@material-ui/lab";
 import HelpIcon from "@material-ui/icons/Help";
 import { BusinessEventValidationSchema } from "../configs/BusinessEvent";
 import { useHistory } from "react-router-dom";
+import { useMutation } from "react-query";
+import { env } from "../core/Environment";
+import axios from "axios";
+
+const createBusinessEvent = async (value: any) => {
+  const { data } = await axios.post(
+    env.apiHostName + env.apis.createBusinessEvent,
+    value
+  );
+  return data;
+};
 
 const useStyles = makeStyles({
   root: {
@@ -78,8 +90,21 @@ const BusinessEvent = ({
   event,
   onClose,
 }: BusinessEventProps) => {
+  const [alertMsg, setAlertMsg] = useState("");
   const classes = useStyles();
   const history = useHistory();
+  // Mutations
+  const businessEventMutation = useMutation(createBusinessEvent, {
+    onSuccess: () => {
+      // Invalidate and refetch
+      // queryClient.invalidateQueries("businessEvents"); // later
+      setAlertMsg("Saved successfully");
+    },
+    onError: (error) => {
+      setAlertMsg((error as any).message);
+    },
+  });
+
   const formik = useFormik({
     // initial values from API
     initialValues: isNew
@@ -100,153 +125,174 @@ const BusinessEvent = ({
       if (isNew) {
         delete postData.businessEventId;
       }
-      alert(JSON.stringify(postData, null, 2));
+      // alert(JSON.stringify(postData, null, 2));
+      if (isNew) {
+        businessEventMutation.mutate(postData);
+      }
       // history.push("/businessRuleMapper");
-      onClose();
+      // onClose();
     },
   });
 
+  const handleAlertClose = () => {
+    if (alertMsg === "Saved successfully") {
+      onClose();
+    }
+    setAlertMsg("");
+  };
+
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      aria-labelledby="business-event-details-dialog"
-      maxWidth="lg"
-    >
-      <DialogTitle id="business-event-details-dialog">
-        {isNew ? "Create new Business Event" : "Show/Edit Business Event"}
-      </DialogTitle>
-      <form onSubmit={formik.handleSubmit}>
-        <DialogContent>
-          <DialogContentText>
-            {isNew
-              ? `To create a new business Event enter the below information.`
-              : `Update details to modify an existing business Event`}
-          </DialogContentText>
-          {!isNew && (
-            <TextField
-              margin="dense"
-              label="Business Event Id"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              name="businessEventId"
-              fullWidth
-              disabled
-              value={formik.values.businessEventId}
-              onBlur={formik.handleBlur}
-              onChange={formik.handleChange}
-            />
-          )}
-          <TextField
-            autoFocus
-            required
-            margin="dense"
-            label="Business Event Name"
-            InputLabelProps={{
-              shrink: true,
-            }}
-            name="businessEventName"
-            fullWidth
-            value={formik.values.businessEventName}
-            onBlur={formik.handleBlur}
-            onChange={formik.handleChange}
-            error={
-              formik.touched.businessEventName &&
-              Boolean(formik.errors.businessEventName)
-            }
-            helperText={
-              formik.touched.businessEventName &&
-              formik.errors.businessEventName
-            }
-            className={classes.businessEventName}
-          />
-          {/* trade model id drop down */}
-          <Autocomplete
-            // id="combo-box-demo"
-            fullWidth
-            value={formik.values.tradeModelId as any}
-            onChange={(event: any, newValue: any | null) => {
-              formik.setFieldValue("tradeModelId", newValue);
-            }}
-            options={tradeModels} // fetched asynchronously; maybe elastic search
-            getOptionLabel={({ id, name }: { id: string; name: string }) =>
-              `${id} : ${name}`
-            }
-            renderInput={(params: any) => (
+    <>
+      <Snackbar
+        open={!!alertMsg}
+        autoHideDuration={2000}
+        onClose={handleAlertClose}
+        anchorOrigin={{ vertical: "top", horizontal: "left" }}
+      >
+        <Alert
+          onClose={handleAlertClose}
+          severity={alertMsg.includes("success") ? "success" : "error"}
+        >
+          {alertMsg}
+        </Alert>
+      </Snackbar>
+      <Dialog
+        open={open}
+        onClose={onClose}
+        aria-labelledby="business-event-details-dialog"
+        maxWidth="lg"
+      >
+        <DialogTitle id="business-event-details-dialog">
+          {isNew ? "Create new Business Event" : "Show/Edit Business Event"}
+        </DialogTitle>
+        <form onSubmit={formik.handleSubmit}>
+          <DialogContent>
+            <DialogContentText>
+              {isNew
+                ? `To create a new business Event enter the below information.`
+                : `Update details to modify an existing business Event`}
+            </DialogContentText>
+            {!isNew && (
               <TextField
-                {...params}
-                required
-                label="Trade Model Id"
+                margin="dense"
+                label="Business Event Id"
                 InputLabelProps={{
                   shrink: true,
                 }}
+                name="businessEventId"
+                fullWidth
+                disabled
+                value={formik.values.businessEventId}
+                onBlur={formik.handleBlur}
+                onChange={formik.handleChange}
               />
             )}
-          />
-          <br />
-          <InputLabel
-            required
-            shrink={true}
-            htmlFor="businessEventTriggerCondition"
-            classes={{
-              root: classes.triggerConditionLabel,
-            }}
-          >
-            Configure Rules&nbsp;
-            <Tooltip title="Add rules to create a trigger condition">
-              <HelpIcon />
-            </Tooltip>
-            &nbsp;
-          </InputLabel>
-          <RuleQueryBuilder
-            buildConfig={BusinessEventTriggerConfig}
-            condition={formik.values.triggerCondition} // renders only once
-            onTriggerCondition={(e: string) => {
-              !formik.touched.triggerCondition &&
-                (formik.values.triggerCondition || e) &&
-                formik.setFieldTouched("triggerCondition", true);
-              if (e) {
-                formik.setFieldError("triggerCondition", "");
+            <TextField
+              autoFocus
+              required
+              margin="dense"
+              label="Business Event Name"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              name="businessEventName"
+              fullWidth
+              value={formik.values.businessEventName}
+              onBlur={formik.handleBlur}
+              onChange={formik.handleChange}
+              error={
+                formik.touched.businessEventName &&
+                Boolean(formik.errors.businessEventName)
               }
-              /*else {
-              if (formik.values.triggerCondition) {
-
+              helperText={
+                formik.touched.businessEventName &&
+                formik.errors.businessEventName
               }
-            }*/
-              formik.setFieldValue("triggerCondition", e);
-            }}
-          />
-          <TextField
-            margin="dense"
-            required
-            disabled
-            multiline
-            label="Trigger Condition"
-            InputLabelProps={{
-              shrink: true,
-            }}
-            name="triggerCondition"
-            id="businessEventTriggerCondition"
-            fullWidth
-            value={JSON.stringify(formik.values.triggerCondition, null, 2)}
-            error={
-              formik.touched.triggerCondition &&
-              Boolean(formik.errors.triggerCondition)
-            }
-            helperText={
-              formik.touched.triggerCondition && formik.errors.triggerCondition
-            }
-            // disabled={!formik.errors.triggerCondition}
-          />
-          <Box>
-            <Button color="primary" type="submit">
-              Save
-            </Button>
-          </Box>
-        </DialogContent>
-      </form>
-    </Dialog>
+              className={classes.businessEventName}
+            />
+            {/* trade model id drop down */}
+            <Autocomplete
+              // id="combo-box-demo"
+              fullWidth
+              value={formik.values.tradeModelId as any}
+              onChange={(event: any, newValue: any | null) => {
+                formik.setFieldValue("tradeModelId", newValue);
+              }}
+              options={tradeModels} // fetched asynchronously; maybe elastic search
+              getOptionLabel={({ id, name }: { id: string; name: string }) =>
+                `${id} : ${name}`
+              }
+              renderInput={(params: any) => (
+                <TextField
+                  {...params}
+                  required
+                  label="Trade Model Id"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+              )}
+            />
+            <br />
+            <InputLabel
+              required
+              shrink={true}
+              htmlFor="businessEventTriggerCondition"
+              classes={{
+                root: classes.triggerConditionLabel,
+              }}
+            >
+              Configure Rules&nbsp;
+              <Tooltip title="Add rules to create a trigger condition">
+                <HelpIcon />
+              </Tooltip>
+              &nbsp;
+            </InputLabel>
+            <RuleQueryBuilder
+              buildConfig={BusinessEventTriggerConfig}
+              condition={formik.values.triggerCondition} // renders only once
+              onTriggerCondition={(e: string) => {
+                !formik.touched.triggerCondition &&
+                  (formik.values.triggerCondition || e) &&
+                  formik.setFieldTouched("triggerCondition", true);
+                if (e) {
+                  formik.setFieldError("triggerCondition", "");
+                }
+                formik.setFieldValue("triggerCondition", e);
+              }}
+            />
+            <TextField
+              margin="dense"
+              required
+              disabled
+              multiline
+              label="Trigger Condition"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              name="triggerCondition"
+              id="businessEventTriggerCondition"
+              fullWidth
+              value={JSON.stringify(formik.values.triggerCondition, null, 2)}
+              error={
+                formik.touched.triggerCondition &&
+                Boolean(formik.errors.triggerCondition)
+              }
+              helperText={
+                formik.touched.triggerCondition &&
+                formik.errors.triggerCondition
+              }
+              // disabled={!formik.errors.triggerCondition}
+            />
+            <Box>
+              <Button color="primary" type="submit">
+                Save
+              </Button>
+            </Box>
+          </DialogContent>
+        </form>
+      </Dialog>
+    </>
   );
 };
 
