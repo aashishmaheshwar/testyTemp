@@ -45,7 +45,7 @@ const mockAPIData = [
   {
     businessEventId: "BE0001",
     businessEventName: "event A",
-    tradeModelId: "TM000028",
+    tradeModelId: "3cb86bac-0fbb-49b7-9c47-32cc9e3d6478",
     triggerCondition: {
       and: [
         {
@@ -62,7 +62,7 @@ const mockAPIData = [
   {
     businessEventId: "BE0002",
     businessEventName: "event B",
-    tradeModelId: "TM000027",
+    tradeModelId: "3cb86bac-0fbb-49b7-9c47-32cc9e3d6478",
     triggerCondition: {
       and: [
         {

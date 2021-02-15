@@ -28,7 +28,7 @@ import { env } from "../core/Environment";
 import axios from "axios";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 
-const getTradeModels = async () => {
+export const getTradeModels = async () => {
   const { data } = await axios.get(env.apiHostName + env.apis.getTradeModels);
   return data;
 };

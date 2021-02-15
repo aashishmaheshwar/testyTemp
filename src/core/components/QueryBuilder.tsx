@@ -25,6 +25,7 @@ const useStyles = makeStyles({
     },
     "& .rule--body": {
       textAlign: "start",
+      display: "flex",
     },
     // "& .group-or-rule": {
     //   background: "whitesmoke",
