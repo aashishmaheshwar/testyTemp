@@ -72,7 +72,45 @@ const useStyles = makeStyles({
 
 const buildTriggerConfig = (tradeModel: any) => {
   // based on attributes, build this
-  return BusinessEventTriggerConfig;
+  const triggerConfig = ((tradeModel.attributes as Array<string>) || []).reduce(
+    (acc: any, item: any) => {
+      if ((BusinessEventTriggerConfig.fields as any)[item]) {
+        acc[item] = { ...(BusinessEventTriggerConfig.fields as any)[item] };
+      } else {
+        if (item.toLowerCase().endsWith("dt")) {
+          acc[item] = {
+            label: item,
+            type: "date",
+          };
+        } else if (item.toLowerCase().endsWith("tm")) {
+          acc[item] = {
+            label: item,
+            type: "time",
+          };
+        } else if (item.toLowerCase().endsWith("qty")) {
+          acc[item] = {
+            label: item,
+            type: "number",
+            preferWidgets: ["number"],
+            fieldSettings: {
+              min: 0,
+            },
+          };
+        } else {
+          acc[item] = {
+            label: item,
+            type: "text",
+          };
+        }
+      }
+      return acc;
+    },
+    {}
+  );
+  return {
+    fields: triggerConfig,
+  };
+  // return BusinessEventTriggerConfig;
 };
 
 const updateTradeModelObj = (
@@ -308,19 +346,21 @@ const BusinessEvent = ({
                 </Tooltip>
                 &nbsp;
               </InputLabel>
-              <RuleQueryBuilder
-                buildConfig={buildTriggerConfig(formik.values.tradeModelId)}
-                condition={formik.values.triggerCondition} // renders only once
-                onTriggerCondition={(e: string) => {
-                  !formik.touched.triggerCondition &&
-                    (formik.values.triggerCondition || e) &&
-                    formik.setFieldTouched("triggerCondition", true);
-                  if (e) {
-                    formik.setFieldError("triggerCondition", "");
-                  }
-                  formik.setFieldValue("triggerCondition", e);
-                }}
-              />
+              {formik.values.tradeModelId.attributes ? (
+                <RuleQueryBuilder
+                  buildConfig={buildTriggerConfig(formik.values.tradeModelId)}
+                  condition={formik.values.triggerCondition} // renders only once
+                  onTriggerCondition={(e: string) => {
+                    !formik.touched.triggerCondition &&
+                      (formik.values.triggerCondition || e) &&
+                      formik.setFieldTouched("triggerCondition", true);
+                    if (e) {
+                      formik.setFieldError("triggerCondition", "");
+                    }
+                    formik.setFieldValue("triggerCondition", e);
+                  }}
+                />
+              ) : null}
               <TextField
                 margin="dense"
                 required

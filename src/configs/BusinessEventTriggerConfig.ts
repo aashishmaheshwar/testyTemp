@@ -15,7 +15,7 @@ const BusinessEventTriggerConfig = {
       preferWidgets: ["number"],
       fieldSettings: {
         min: 0,
-      }
+      },
     },
     LeavesQty: {
       label: "LeavesQty",
@@ -23,15 +23,15 @@ const BusinessEventTriggerConfig = {
       preferWidgets: ["number"],
       fieldSettings: {
         min: 0,
-      }
+      },
     },
     LastMkt: {
       label: "LastMkt",
-      type: "text"
+      type: "text",
     },
     LastPX: {
       label: "LastPX",
-      type: "number"
+      type: "number",
     },
     LastQty: {
       label: "LastQty",
@@ -39,20 +39,20 @@ const BusinessEventTriggerConfig = {
       preferWidgets: ["number"],
       fieldSettings: {
         min: 0,
-      }
+      },
     },
-    ExecTyp: {
-      label: "ExecTyp",
-      type: "select",
-      valueSources: ["value"],
-      fieldSettings: {
-        listValues: [
-          { value: "F", title: "Fix" },
-          { value: "S", title: "SIP" },
-        ],
-        // allowCustomValues: true
-      }
-    }
+    // ExecTyp: {
+    //   label: "ExecTyp",
+    //   type: "select",
+    //   valueSources: ["value"],
+    //   fieldSettings: {
+    //     listValues: [
+    //       { value: "F", title: "Fix" },
+    //       { value: "S", title: "SIP" },
+    //     ],
+    //     // allowCustomValues: true
+    //   }
+    // }
   },
 };
 

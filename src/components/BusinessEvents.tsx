@@ -45,13 +45,13 @@ const mockAPIData = [
   {
     businessEventId: "BE0001",
     businessEventName: "event A",
-    tradeModelId: "3cb86bac-0fbb-49b7-9c47-32cc9e3d6478",
+    tradeModelId: "800a5e13-8c1a-4138-908c-bdabc91d579e",
     triggerCondition: {
       and: [
         {
           "==": [
             {
-              var: "CumQty",
+              var: "Val",
             },
             4,
           ],
