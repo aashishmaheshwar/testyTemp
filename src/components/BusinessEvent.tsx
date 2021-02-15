@@ -346,7 +346,7 @@ const BusinessEvent = ({
                 </Tooltip>
                 &nbsp;
               </InputLabel>
-              {formik.values.tradeModelId.attributes ? (
+              {formik.values.tradeModelId?.attributes ? (
                 <RuleQueryBuilder
                   buildConfig={buildTriggerConfig(formik.values.tradeModelId)}
                   condition={formik.values.triggerCondition} // renders only once
