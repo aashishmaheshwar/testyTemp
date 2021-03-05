@@ -15,7 +15,13 @@ export const RuleModelValidationSchema = yup.object().shape({
         values: yup
           .array()
           .of(yup.string())
-          .min(1, "Atleast one value is needed"),
+          .when("type", {
+            is: (val) => val === "ENUM",
+            then: yup
+              .array()
+              .of(yup.string())
+              .min(1, "Atleast one value is needed"),
+          }),
         length: yup
           .string()
           .when("type", {

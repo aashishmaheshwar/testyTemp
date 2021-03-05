@@ -218,7 +218,7 @@ const BusinessEvent = ({
       if (isNew) {
         delete postData.businessEventId;
       }
-      alert(JSON.stringify(postData, null, 2));
+      // alert(JSON.stringify(postData, null, 2));
       if (isNew) {
         businessEventMutation.mutate(postData);
       } else {

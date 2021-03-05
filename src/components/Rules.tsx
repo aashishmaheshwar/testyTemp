@@ -8,7 +8,7 @@ import Box from "@material-ui/core/Box";
 import { makeStyles } from "@material-ui/core/styles";
 import React, { useState } from "react";
 import { StyledTableCell, StyledTableRow } from "./../core/Table";
-import { Button } from "@material-ui/core";
+import { Button, TablePagination } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import createRuleModelMutation from "./RuleModel";
 import { env } from "../core/Environment";
@@ -144,6 +144,19 @@ const Rules = () => {
   const [open, setOpen] = useState(false);
   // const [rows, setRows] = useState(mockAPIData);
   const history = useHistory();
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   return (
     <Box>
@@ -181,39 +194,52 @@ const Rules = () => {
         ) : status === "error" ? (
           <span>Error: {(error as any)?.message}</span>
         ) : (
-          <TableContainer component={Paper}>
-            <Table className={classes.table} aria-label="Rules">
-              <TableHead>
-                <TableRow>
-                  <StyledTableCell>Rule ID</StyledTableCell>
-                  <StyledTableCell>Rule Name</StyledTableCell>
-                  <StyledTableCell>Rule Type</StyledTableCell>
-                  <StyledTableCell>Edit / Show</StyledTableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {(rows || []).map((row: any) => (
-                  <StyledTableRow key={row.ruleId}>
-                    <StyledTableCell component="th" scope="row">
-                      {row.ruleId}
-                    </StyledTableCell>
-                    <StyledTableCell>{row.ruleName}</StyledTableCell>
-                    <StyledTableCell>{row.ruleType}</StyledTableCell>
-                    <StyledTableCell>
-                      <Button
-                        color="primary"
-                        variant="outlined"
-                        size="small"
-                        onClick={() => setSelectedRule(row)}
-                      >
-                        Show/ Edit Details
-                      </Button>
-                    </StyledTableCell>
-                  </StyledTableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <>
+            <TableContainer component={Paper}>
+              <Table className={classes.table} aria-label="Rules">
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell>Rule ID</StyledTableCell>
+                    <StyledTableCell>Rule Name</StyledTableCell>
+                    <StyledTableCell>Rule Type</StyledTableCell>
+                    <StyledTableCell>Edit / Show</StyledTableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {(rows || [])
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map((row: any) => (
+                      <StyledTableRow key={row.ruleId}>
+                        <StyledTableCell component="th" scope="row">
+                          {row.ruleId}
+                        </StyledTableCell>
+                        <StyledTableCell>{row.ruleName}</StyledTableCell>
+                        <StyledTableCell>{row.ruleType}</StyledTableCell>
+                        <StyledTableCell>
+                          <Button
+                            color="primary"
+                            variant="outlined"
+                            size="small"
+                            onClick={() => setSelectedRule(row)}
+                          >
+                            Show/ Edit Details
+                          </Button>
+                        </StyledTableCell>
+                      </StyledTableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={(rows || []).length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onChangePage={handleChangePage}
+              onChangeRowsPerPage={handleChangeRowsPerPage}
+            />
+          </>
         )}
       </Box>
     </Box>

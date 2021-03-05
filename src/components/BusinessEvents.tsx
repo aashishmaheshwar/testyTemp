@@ -9,7 +9,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import React, { useState } from "react";
 import { StyledTableCell, StyledTableRow } from "./../core/Table";
 import BusinessEvent from "./BusinessEvent";
-import { Button } from "@material-ui/core";
+import { Button, TablePagination } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { env } from "../core/Environment";
 import axios from "axios";
@@ -103,8 +103,20 @@ const BusinessEvents = () => {
     "businessEvents",
     getBusinessEvents
   );
-
   const history = useHistory();
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   return (
     <Box>
@@ -152,42 +164,53 @@ const BusinessEvents = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {(rows || []).map((row: any) => (
-                  <StyledTableRow key={row.businessEventId}>
-                    <StyledTableCell component="th" scope="row">
-                      {row.businessEventId}
-                    </StyledTableCell>
-                    <StyledTableCell>{row.businessEventName}</StyledTableCell>
-                    <StyledTableCell>{row.tradeModelId}</StyledTableCell>
-                    <StyledTableCell>
-                      <Button
-                        color="primary"
-                        variant="outlined"
-                        size="small"
-                        onClick={() => setSelectedEvent(row)}
-                      >
-                        Show/ Edit Details
-                      </Button>
-                    </StyledTableCell>
-                    <StyledTableCell>
-                      <Button
-                        color="primary"
-                        variant="outlined"
-                        size="small"
-                        onClick={() =>
-                          history.push(
-                            `/businessRuleMapper?businessEventId=${row.businessEventId}`
-                          )
-                        }
-                      >
-                        Create/ Show rules
-                      </Button>
-                    </StyledTableCell>
-                  </StyledTableRow>
-                ))}
+                {(rows || [])
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((row: any) => (
+                    <StyledTableRow key={row.businessEventId}>
+                      <StyledTableCell component="th" scope="row">
+                        {row.businessEventId}
+                      </StyledTableCell>
+                      <StyledTableCell>{row.businessEventName}</StyledTableCell>
+                      <StyledTableCell>{row.tradeModelId}</StyledTableCell>
+                      <StyledTableCell>
+                        <Button
+                          color="primary"
+                          variant="outlined"
+                          size="small"
+                          onClick={() => setSelectedEvent(row)}
+                        >
+                          Show/ Edit Details
+                        </Button>
+                      </StyledTableCell>
+                      <StyledTableCell>
+                        <Button
+                          color="primary"
+                          variant="outlined"
+                          size="small"
+                          onClick={() =>
+                            history.push(
+                              `/businessRuleMapper?businessEventId=${row.businessEventId}`
+                            )
+                          }
+                        >
+                          Create/ Show rules
+                        </Button>
+                      </StyledTableCell>
+                    </StyledTableRow>
+                  ))}
               </TableBody>
             </Table>
           </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={(rows || []).length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onChangePage={handleChangePage}
+            onChangeRowsPerPage={handleChangeRowsPerPage}
+          />
         </Box>
       )}
     </Box>
