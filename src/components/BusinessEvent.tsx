@@ -19,7 +19,7 @@ import { Autocomplete, Alert } from "@material-ui/lab";
 import HelpIcon from "@material-ui/icons/Help";
 import { BusinessEventValidationSchema } from "../configs/BusinessEvent";
 import { useHistory } from "react-router-dom";
-import { useMutation, useQuery } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import { env } from "../core/Environment";
 import axios from "axios";
 import { getTradeModels } from "./Trades";
@@ -28,6 +28,14 @@ import { Trade } from "../types/Trade";
 const createBusinessEvent = async (value: any) => {
   const { data } = await axios.post(
     `${env.apiHostName}/${env.apis.createBusinessEvent}`,
+    value
+  );
+  return data;
+};
+
+const updateBusinessEvent = async (value: any) => {
+  const { data } = await axios.put(
+    `${env.apiHostName}/${env.apis.updateBusinessEvent}`,
     value
   );
   return data;
@@ -141,11 +149,22 @@ const BusinessEvent = ({
   const [alertMsg, setAlertMsg] = useState("");
   const classes = useStyles();
   const history = useHistory();
+  const queryClient = useQueryClient();
   // Mutations
   const businessEventMutation = useMutation(createBusinessEvent, {
     onSuccess: () => {
       // Invalidate and refetch
-      // queryClient.invalidateQueries("businessEvents"); // later
+      queryClient.invalidateQueries("businessEvents"); // later
+      setAlertMsg("Saved successfully");
+    },
+    onError: (error) => {
+      setAlertMsg((error as any).message);
+    },
+  });
+  const updateBusinessEventMutation = useMutation(updateBusinessEvent, {
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries("businessEvents"); // later
       setAlertMsg("Saved successfully");
     },
     onError: (error) => {
@@ -204,6 +223,7 @@ const BusinessEvent = ({
         businessEventMutation.mutate(postData);
       } else {
         // until update API implementation
+        updateBusinessEventMutation.mutate(postData);
         onClose();
       }
       // history.push("/businessRuleMapper");

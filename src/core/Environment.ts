@@ -16,7 +16,8 @@ export const env = {
 
     //business event
     createBusinessEvent: "model-design/api/v1/businessEvent", // post call
-    getBusinessEvents: "/model-design/api/v1/businessEvent", // get call
+    getBusinessEvents: "model-design/api/v1/businessEvent", // get call
+    updateBusinessEvent: "model-design/api/v1/businessEvent", // put call
   },
 };
 
