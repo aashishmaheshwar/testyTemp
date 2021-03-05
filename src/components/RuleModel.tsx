@@ -26,7 +26,7 @@ import { Alert } from "@material-ui/lab";
 
 const createRuleModel = async (value: typeof RuleInitialValues) => {
   const { data } = await axios.post(
-    env.apiHostName + env.apis.createRuleModel,
+    `${env.apiHostName}/${env.apis.createRuleModel}`,
     value
   );
   return data;
@@ -34,7 +34,7 @@ const createRuleModel = async (value: typeof RuleInitialValues) => {
 
 const updateRuleModel = async (value: typeof RuleInitialValues) => {
   const { data } = await axios.put(
-    env.apiHostName + env.apis.updateRuleModel,
+    `${env.apiHostName}/${env.apis.updateRuleModel}`,
     value
   );
   return data;
@@ -72,6 +72,7 @@ const RuleModel = ({
       setAlertMsg((error as any).message);
     },
   });
+
   const updateRuleModelMutation = useMutation(updateRuleModel, {
     onSuccess: () => {
       // Invalidate and refetch

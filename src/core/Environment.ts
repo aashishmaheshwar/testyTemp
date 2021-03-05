@@ -1,5 +1,5 @@
 export const env = {
-  apiHostName: "http://35.236.18.89/",
+  apiHostName: "http://35.236.11.207:8080",
   apis: {
     //trade model
     getAttributes: "model-design/api/v1/readXml", // post call
@@ -16,6 +16,7 @@ export const env = {
 
     //business event
     createBusinessEvent: "model-design/api/v1/businessEvent", // post call
+    getBusinessEvents: "/model-design/api/v1/businessEvent", // get call
   },
 };
 

@@ -11,6 +11,20 @@ import { StyledTableCell, StyledTableRow } from "./../core/Table";
 import BusinessEvent from "./BusinessEvent";
 import { Button } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
+import { env } from "../core/Environment";
+import axios from "axios";
+import { useQuery } from "react-query";
+
+const getBusinessEvents = async () => {
+  const { data } = await axios.get(
+    `${env.apiHostName}/${env.apis.getBusinessEvents}`
+  );
+  return (data as Array<any>).map((item) => {
+    const { triggerCondition: strTriggerCondition, ...rest } = item;
+    const triggerCondition = JSON.parse(strTriggerCondition);
+    return { ...rest, triggerCondition };
+  });
+};
 
 const useStyles = makeStyles({
   table: {
@@ -51,9 +65,9 @@ const mockAPIData = [
         {
           "==": [
             {
-              var: "Val",
+              var: "Exec",
             },
-            4,
+            2,
           ],
         },
       ],
@@ -84,7 +98,12 @@ const BusinessEvents = () => {
     typeof mockAPIData[0] | null
   >(null);
   const [open, setOpen] = useState(false);
-  const [rows, setRows] = useState(mockAPIData);
+  // const [rows, setRows] = useState(mockAPIData);
+  const { data: rows, error, isFetching } = useQuery(
+    "businessEvents",
+    getBusinessEvents
+  );
+
   const history = useHistory();
 
   return (
@@ -117,56 +136,60 @@ const BusinessEvents = () => {
           + New Business Event
         </Button>
       </Box>
-      <Box>
-        <TableContainer component={Paper}>
-          <Table className={classes.table} aria-label="Business Events">
-            <TableHead>
-              <TableRow>
-                <StyledTableCell>Business Event ID</StyledTableCell>
-                <StyledTableCell>Business Event Name</StyledTableCell>
-                <StyledTableCell>Trade Model ID</StyledTableCell>
-                <StyledTableCell>Edit / Show</StyledTableCell>
-                <StyledTableCell>Rules</StyledTableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row) => (
-                <StyledTableRow key={row.businessEventId}>
-                  <StyledTableCell component="th" scope="row">
-                    {row.businessEventId}
-                  </StyledTableCell>
-                  <StyledTableCell>{row.businessEventName}</StyledTableCell>
-                  <StyledTableCell>{row.tradeModelId}</StyledTableCell>
-                  <StyledTableCell>
-                    <Button
-                      color="primary"
-                      variant="outlined"
-                      size="small"
-                      onClick={() => setSelectedEvent(row)}
-                    >
-                      Show/ Edit Details
-                    </Button>
-                  </StyledTableCell>
-                  <StyledTableCell>
-                    <Button
-                      color="primary"
-                      variant="outlined"
-                      size="small"
-                      onClick={() =>
-                        history.push(
-                          `/businessRuleMapper?businessEventId=${row.businessEventId}`
-                        )
-                      }
-                    >
-                      Create/ Show rules
-                    </Button>
-                  </StyledTableCell>
-                </StyledTableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
+      {isFetching ? (
+        "Fetching Business Events"
+      ) : (
+        <Box>
+          <TableContainer component={Paper}>
+            <Table className={classes.table} aria-label="Business Events">
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell>Business Event ID</StyledTableCell>
+                  <StyledTableCell>Business Event Name</StyledTableCell>
+                  <StyledTableCell>Trade Model ID</StyledTableCell>
+                  <StyledTableCell>Edit / Show</StyledTableCell>
+                  <StyledTableCell>Rules</StyledTableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {(rows || []).map((row: any) => (
+                  <StyledTableRow key={row.businessEventId}>
+                    <StyledTableCell component="th" scope="row">
+                      {row.businessEventId}
+                    </StyledTableCell>
+                    <StyledTableCell>{row.businessEventName}</StyledTableCell>
+                    <StyledTableCell>{row.tradeModelId}</StyledTableCell>
+                    <StyledTableCell>
+                      <Button
+                        color="primary"
+                        variant="outlined"
+                        size="small"
+                        onClick={() => setSelectedEvent(row)}
+                      >
+                        Show/ Edit Details
+                      </Button>
+                    </StyledTableCell>
+                    <StyledTableCell>
+                      <Button
+                        color="primary"
+                        variant="outlined"
+                        size="small"
+                        onClick={() =>
+                          history.push(
+                            `/businessRuleMapper?businessEventId=${row.businessEventId}`
+                          )
+                        }
+                      >
+                        Create/ Show rules
+                      </Button>
+                    </StyledTableCell>
+                  </StyledTableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      )}
     </Box>
   );
 };

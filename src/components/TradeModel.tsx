@@ -20,7 +20,7 @@ import { getAttributes } from "./Trades";
 
 const updateTradeModel = async (value: Trade) => {
   const { data } = await axios.put(
-    env.apiHostName + env.apis.updateTradeModel,
+    `${env.apiHostName}/${env.apis.updateTradeModel}`,
     value
   );
   return data;

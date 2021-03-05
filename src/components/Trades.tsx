@@ -29,7 +29,9 @@ import axios from "axios";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 
 export const getTradeModels = async () => {
-  const { data } = await axios.get(env.apiHostName + env.apis.getTradeModels);
+  const { data } = await axios.get(
+    env.apiHostName + "/" + env.apis.getTradeModels
+  );
   return data;
 };
 
@@ -37,7 +39,7 @@ export const getAttributes = async (file: any) => {
   const formData = new FormData();
   formData.append("file", file);
   const { data } = await axios.post(
-    env.apiHostName + env.apis.getAttributes,
+    env.apiHostName + "/" + env.apis.getAttributes,
     formData,
     {
       headers: {
@@ -105,7 +107,7 @@ const useStyles = makeStyles({
 
 const createTradeModel = async (value: Trade) => {
   const { data } = await axios.post(
-    env.apiHostName + env.apis.createTradeModel,
+    env.apiHostName + "/" + env.apis.createTradeModel,
     value
   );
   return data;

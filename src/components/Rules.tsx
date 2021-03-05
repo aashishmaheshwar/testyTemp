@@ -17,7 +17,9 @@ import { useQuery } from "react-query";
 import RuleModel from "./RuleModel";
 
 export const getRuleTypes = async () => {
-  const { data } = await axios.get(env.apiHostName + env.apis.getRuleTypes);
+  const { data } = await axios.get(
+    `${env.apiHostName}/${env.apis.getRuleTypes}`
+  );
   return data;
 };
 
@@ -36,28 +38,35 @@ export const getRuleModelForRuleId = async (id: string) => {
 };
 
 const getRuleModels = async () => {
-  const ruleTypes = await getRuleTypes();
-  // ruleTypes.map(({id}) => id) do parallel get to fetch all ids, then get all rules
-  const ids = ((await axios
-    .all(
-      (ruleTypes as Array<{ id: string }>).map(({ id }) =>
-        getRuleIdsForRuleType(id)
-      )
-    )
-    .then(
-      axios.spread((...responses) => {
-        return responses;
-      })
-    )) as Array<any>).flat();
-  const data = ((await axios
-    .all((ids as Array<string>).map((id) => getRuleModelForRuleId(id)))
-    .then(
-      axios.spread((...responses) => {
-        return responses.map((item, idx) => ({ ...item, ruleId: ids[idx] }));
-      })
-    )) as Array<any>).flat();
-  return data;
+  const { data } = await axios.get(
+    `${env.apiHostName}/${env.apis.getRuleModel}`
+  );
+  return data as Array<any>;
 };
+
+// const getRuleModels = async () => {
+//   const ruleTypes = await getRuleTypes();
+//   // ruleTypes.map(({id}) => id) do parallel get to fetch all ids, then get all rules
+//   const ids = ((await axios
+//     .all(
+//       (ruleTypes as Array<{ id: string }>).map(({ id }) =>
+//         getRuleIdsForRuleType(id)
+//       )
+//     )
+//     .then(
+//       axios.spread((...responses) => {
+//         return responses;
+//       })
+//     )) as Array<any>).flat();
+//   const data = ((await axios
+//     .all((ids as Array<string>).map((id) => getRuleModelForRuleId(id)))
+//     .then(
+//       axios.spread((...responses) => {
+//         return responses.map((item, idx) => ({ ...item, ruleId: ids[idx] }));
+//       })
+//     )) as Array<any>).flat();
+//   return data;
+// };
 
 const useStyles = makeStyles({
   table: {
@@ -183,7 +192,7 @@ const Rules = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {(rows || []).map((row) => (
+                {(rows || []).map((row: any) => (
                   <StyledTableRow key={row.ruleId}>
                     <StyledTableCell component="th" scope="row">
                       {row.ruleId}

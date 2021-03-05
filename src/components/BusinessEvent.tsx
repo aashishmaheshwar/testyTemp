@@ -27,7 +27,7 @@ import { Trade } from "../types/Trade";
 
 const createBusinessEvent = async (value: any) => {
   const { data } = await axios.post(
-    env.apiHostName + env.apis.createBusinessEvent,
+    `${env.apiHostName}/${env.apis.createBusinessEvent}`,
     value
   );
   return data;
