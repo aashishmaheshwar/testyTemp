@@ -9,8 +9,24 @@ import { makeStyles } from "@material-ui/core/styles";
 import React, { useState } from "react";
 import { StyledTableCell, StyledTableRow } from "./../core/Table";
 import { Button } from "@material-ui/core";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import BusinessRuleMapper from "./BusinessRuleMapper";
+import { env } from "../core/Environment";
+import axios from "axios";
+import { useQuery } from "react-query";
+
+// A custom hook that builds on useLocation to parse
+// the query string for you.
+export const useQueryParams = () => {
+  return new URLSearchParams(useLocation().search);
+};
+
+export const getBusinessEventRules = (businessEventId: string) => async () => {
+  const { data } = await axios.get(
+    `${env.apiHostName}/${env.apis.getBusinessEventRules}?businessEventId=${businessEventId}`
+  );
+  return data;
+};
 
 const useStyles = makeStyles({
   table: {
@@ -70,8 +86,23 @@ const BusinessRules = () => {
     typeof mockAPIData[0] | null
   >(null);
   const [open, setOpen] = useState(false);
-  const [rows, setRows] = useState(mockAPIData);
   const history = useHistory();
+  const businessEventId = useQueryParams().get("businessEventId");
+
+  if (!businessEventId) {
+    history.push("/businessEvent");
+  }
+
+  const {
+    data: rows,
+    isFetching: isBusinessEventRuleModelsFetching,
+    status,
+    error,
+  } = useQuery(
+    "businessEventRules",
+    getBusinessEventRules(businessEventId as string)
+  );
+  // const [rows, setRows] = useState(mockAPIData);
 
   return (
     <Box>
@@ -104,39 +135,43 @@ const BusinessRules = () => {
         </Button>
       </Box>
       <Box>
-        <TableContainer component={Paper}>
-          <Table className={classes.table} aria-label="Business Event Rules">
-            <TableHead>
-              <TableRow>
-                <StyledTableCell>Business Event Rule ID</StyledTableCell>
-                <StyledTableCell>Rule Type</StyledTableCell>
-                <StyledTableCell>Rule Id</StyledTableCell>
-                <StyledTableCell>Edit / Show</StyledTableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row) => (
-                <StyledTableRow key={row.businessEventRuleId}>
-                  <StyledTableCell component="th" scope="row">
-                    {row.businessEventRuleId}
-                  </StyledTableCell>
-                  <StyledTableCell>{row.ruleType}</StyledTableCell>
-                  <StyledTableCell>{row.ruleId}</StyledTableCell>
-                  <StyledTableCell>
-                    <Button
-                      color="primary"
-                      variant="outlined"
-                      size="small"
-                      onClick={() => setSelectedBusinessEventRule(row)}
-                    >
-                      Show/ Edit Details
-                    </Button>
-                  </StyledTableCell>
-                </StyledTableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        {isBusinessEventRuleModelsFetching ? (
+          "Fetching business event rules"
+        ) : (
+          <TableContainer component={Paper}>
+            <Table className={classes.table} aria-label="Business Event Rules">
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell>Business Event Rule ID</StyledTableCell>
+                  <StyledTableCell>Rule Type</StyledTableCell>
+                  <StyledTableCell>Rule Id</StyledTableCell>
+                  <StyledTableCell>Edit / Show</StyledTableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {(rows || []).map((row: any) => (
+                  <StyledTableRow key={row.businessEventRuleId}>
+                    <StyledTableCell component="th" scope="row">
+                      {row.businessEventRuleId}
+                    </StyledTableCell>
+                    <StyledTableCell>{row.ruleType}</StyledTableCell>
+                    <StyledTableCell>{row.ruleId}</StyledTableCell>
+                    <StyledTableCell>
+                      <Button
+                        color="primary"
+                        variant="outlined"
+                        size="small"
+                        onClick={() => setSelectedBusinessEventRule(row)}
+                      >
+                        Show/ Edit Details
+                      </Button>
+                    </StyledTableCell>
+                  </StyledTableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </Box>
     </Box>
   );
