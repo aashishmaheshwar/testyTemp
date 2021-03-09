@@ -22,6 +22,10 @@ export const env = {
     //business rule mapper
     getBusinessEventRules:
       "model-design/api/v1/businessEvent/businessEventRule", // get call
+    createBusinessEventRule:
+      "model-design/api/v1/businessEvent/businessEventRule", // post call
+    updateBusinessEventRule:
+      "model-design/api/v1/businessEvent/businessEventRule", // put call
   },
 };
 
