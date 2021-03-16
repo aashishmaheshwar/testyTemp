@@ -16,10 +16,11 @@ import { TradeAttributes } from "../types/Trade";
 
 type RuleMapperProps = {
   formikProps: FormikProps<BusinessRuleMapper>;
+  options: Array<string>;
 };
 
 // options are based on the tradeId associated.
-const options: Array<string> = [...TradeAttributes];
+// const options: Array<string> = [...TradeAttributes];
 
 // standard functions - sample here
 const functionOptions: Array<string> = [
@@ -28,7 +29,7 @@ const functionOptions: Array<string> = [
   "RefData-GetAccount",
 ];
 
-const RuleMapper = ({ formikProps }: RuleMapperProps) => {
+const RuleMapper = ({ formikProps, options }: RuleMapperProps) => {
   const { values, errors, touched, getFieldProps, setFieldValue } = formikProps;
   const classes = useRuleMapperStyles();
 
@@ -106,7 +107,6 @@ const RuleMapper = ({ formikProps }: RuleMapperProps) => {
                       {/* mappedTo */}
                       {getFieldProps(type).value === "value" && (
                         <Autocomplete
-                          freeSolo
                           classes={{
                             root: `${classes.acRoot} ${classes.mappedToRoot}`,
                             input: classes.acInput,
@@ -168,7 +168,6 @@ const RuleMapper = ({ formikProps }: RuleMapperProps) => {
                             )}
                           />
                           <Autocomplete
-                            freeSolo
                             multiple
                             classes={{
                               root: `${classes.acRoot} ${classes.argsRoot}`,

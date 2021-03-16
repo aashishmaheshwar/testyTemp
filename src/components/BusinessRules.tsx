@@ -88,6 +88,7 @@ const BusinessRules = () => {
   const [open, setOpen] = useState(false);
   const history = useHistory();
   const businessEventId = useQueryParams().get("businessEventId");
+  const tradeModelId = useQueryParams().get("tradeModelId");
 
   if (!businessEventId) {
     history.push("/businessEvent");
@@ -111,6 +112,7 @@ const BusinessRules = () => {
           open={!!selectedBusinessEventRule}
           event={selectedBusinessEventRule}
           businessEventId={businessEventId}
+          tradeModelId={tradeModelId}
           onClose={() => {
             setSelectedBusinessEventRule(null);
           }}
@@ -121,6 +123,7 @@ const BusinessRules = () => {
           isNew
           open
           businessEventId={businessEventId}
+          tradeModelId={tradeModelId}
           onClose={() => {
             setOpen(false);
           }}

@@ -26,6 +26,7 @@ import {
   getRuleModelForRuleId,
   getRuleTypes,
 } from "./Rules";
+import { getTradeModelForId } from "./Trades";
 
 export const createBusinessEventRule = async (body: any) => {
   const { data } = await axios.post(
@@ -67,6 +68,7 @@ type BusinessRuleProps = {
   open?: boolean;
   event?: any;
   businessEventId: string | null;
+  tradeModelId: string | null;
   onClose: any;
 };
 
@@ -76,6 +78,7 @@ const BusinessRuleMapper = ({
   event,
   onClose,
   businessEventId,
+  tradeModelId,
 }: BusinessRuleProps) => {
   const [alertMsg, setAlertMsg] = useState("");
   const [ruleIds, setRuleIds] = useState([]);
@@ -83,6 +86,10 @@ const BusinessRuleMapper = ({
   const { data: ruleTypes, isFetching: isRuleTypesFetching } = useQuery(
     "ruleTypes",
     getRuleTypes
+  );
+  const { data: tradeModel, isFetching: isTradeModelFetching } = useQuery(
+    `tradeModel-${tradeModelId}`,
+    getTradeModelForId(tradeModelId as string)
   );
   // Mutations
   const businessEventMutation = useMutation(createBusinessEventRule, {
@@ -288,7 +295,10 @@ const BusinessRuleMapper = ({
                     />
                     {getFieldProps("ruleId").value &&
                       values.mapping?.length && (
-                        <RuleMapper formikProps={formikProps} />
+                        <RuleMapper
+                          formikProps={formikProps}
+                          options={tradeModel.attributes || []}
+                        />
                       )}
                     <Box>
                       <Button

@@ -190,7 +190,7 @@ const BusinessEvents = () => {
                           size="small"
                           onClick={() =>
                             history.push(
-                              `/businessRuleMapper?businessEventId=${row.businessEventId}`
+                              `/businessRuleMapper?businessEventId=${row.businessEventId}&tradeModelId=${row.tradeModelId}`
                             )
                           }
                         >
