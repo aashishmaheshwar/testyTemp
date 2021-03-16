@@ -12,7 +12,7 @@ import {
 import { Autocomplete, Alert } from "@material-ui/lab";
 import { Form, Formik } from "formik";
 import React, { useState } from "react";
-import { MockRuleIds, RuleTypes } from "../configs/RuleModel";
+// import { MockRuleIds, RuleTypes } from "../configs/RuleModel";
 import {
   BusinessRuleMapperInitialValues,
   RuleMapperValidationSchema,
@@ -21,6 +21,11 @@ import RuleMapper from "./RuleMapper";
 import { env } from "../core/Environment";
 import axios from "axios";
 import { useMutation, useQuery, useQueryClient } from "react-query";
+import {
+  getRuleIdsForRuleType,
+  getRuleModelForRuleId,
+  getRuleTypes,
+} from "./Rules";
 
 export const createBusinessEventRule = async (body: any) => {
   const { data } = await axios.post(
@@ -38,7 +43,7 @@ export const updateBusinessEventRule = async (body: any) => {
   return data;
 };
 
-const updateBusinessRuleMapper = (event: any): any => {
+const updateBusinessRuleMapper = (event: any, ruleTypes: any): any => {
   return {
     ...event,
     mapping: event.mapping.map((obj: any) => {
@@ -52,7 +57,7 @@ const updateBusinessRuleMapper = (event: any): any => {
       return newObj;
     }),
     ruleType: {
-      ...RuleTypes.find(({ id }) => id === event.ruleType),
+      ...ruleTypes.find(({ id }: any) => id === event.ruleType),
     },
   };
 };
@@ -71,7 +76,12 @@ const BusinessRuleMapper = ({
   onClose,
 }: BusinessRuleProps) => {
   const [alertMsg, setAlertMsg] = useState("");
+  const [ruleIds, setRuleIds] = useState([]);
   const queryClient = useQueryClient();
+  const { data: ruleTypes, isFetching: isRuleTypesFetching } = useQuery(
+    "ruleTypes",
+    getRuleTypes
+  );
   // Mutations
   const businessEventMutation = useMutation(createBusinessEventRule, {
     onSuccess: () => {
@@ -134,149 +144,164 @@ const BusinessRuleMapper = ({
           ? "Create new Business Event Rule"
           : "Show/Edit Business Event Rule"}
       </Typography> */}
-        <Formik
-          initialValues={
-            isNew
-              ? BusinessRuleMapperInitialValues
-              : updateBusinessRuleMapper({ ...event })
-          }
-          validationSchema={RuleMapperValidationSchema}
-          onSubmit={(values, { resetForm, setSubmitting }) => {
-            setSubmitting(true);
-            const {
-              ruleType: { id: ruleType },
-            } = values as any;
-            const mapping = values.mapping.map((obj: any) => {
-              const newObj = { ...obj };
-              if (newObj.type === "function") {
-                newObj.properties = [...obj.functionArgs];
-                delete newObj.functionArgs;
-              } else {
-                newObj.properties = [obj.mappedTo];
-                delete newObj.mappedTo;
+        {isRuleTypesFetching ? (
+          "fetching rule types"
+        ) : (
+          <Formik
+            initialValues={
+              isNew
+                ? BusinessRuleMapperInitialValues
+                : updateBusinessRuleMapper({ ...event }, ruleTypes)
+            }
+            validationSchema={RuleMapperValidationSchema}
+            onSubmit={(values, { resetForm, setSubmitting }) => {
+              setSubmitting(true);
+              const {
+                ruleType: { id: ruleType },
+              } = values as any;
+              const mapping = values.mapping.map((obj: any) => {
+                const newObj = { ...obj };
+                if (newObj.type === "function") {
+                  newObj.properties = [...obj.functionArgs];
+                  delete newObj.functionArgs;
+                } else {
+                  newObj.properties = [obj.mappedTo];
+                  delete newObj.mappedTo;
+                }
+                return newObj;
+              });
+              let postData: any = { ...values, mapping, ruleType };
+              if (isNew) {
+                delete postData.businessEventRuleId;
               }
-              return newObj;
-            });
-            let postData: any = { ...values, mapping, ruleType };
-            if (isNew) {
-              delete postData.businessEventRuleId;
-            }
-            //   postData.attributes = postData.attributes.map(
-            //     ({ id, ...rest }: any) => rest
-            //   );
-            alert(JSON.stringify(postData, null, 2));
-            if (isNew) {
-              businessEventMutation.mutate(postData);
-            } else {
-              updateBusinessEventMutation.mutate(postData);
-            }
-            resetForm();
-            setSubmitting(false);
-            onClose();
-          }}
-        >
-          {(formikProps) => {
-            const {
-              values,
-              touched,
-              errors,
-              handleChange,
-              handleBlur,
-              isValid,
-              setFieldValue,
-              getFieldProps,
-              isSubmitting,
-            } = formikProps;
+              //   postData.attributes = postData.attributes.map(
+              //     ({ id, ...rest }: any) => rest
+              //   );
+              alert(JSON.stringify(postData, null, 2));
+              if (isNew) {
+                businessEventMutation.mutate(postData);
+              } else {
+                updateBusinessEventMutation.mutate(postData);
+              }
+              resetForm();
+              setSubmitting(false);
+              onClose();
+            }}
+          >
+            {(formikProps) => {
+              const {
+                values,
+                touched,
+                errors,
+                handleChange,
+                handleBlur,
+                isValid,
+                setFieldValue,
+                getFieldProps,
+                isSubmitting,
+              } = formikProps;
 
-            return (
-              <Form>
-                <DialogContent>
-                  <DialogContentText>
-                    {isNew
-                      ? `To create a new business event rule enter the below information.`
-                      : `Update details to modify an existing business event rule`}
-                  </DialogContentText>
-                  {!isNew && (
-                    <TextField
-                      margin="dense"
-                      label="Business Event Rule Id"
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
+              return (
+                <Form>
+                  <DialogContent>
+                    <DialogContentText>
+                      {isNew
+                        ? `To create a new business event rule enter the below information.`
+                        : `Update details to modify an existing business event rule`}
+                    </DialogContentText>
+                    {!isNew && (
+                      <TextField
+                        margin="dense"
+                        label="Business Event Rule Id"
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
+                        fullWidth
+                        disabled
+                        {...getFieldProps("businessEventRuleId")}
+                      />
+                    )}
+                    <Autocomplete
                       fullWidth
-                      disabled
-                      {...getFieldProps("businessEventRuleId")}
+                      value={values.ruleType as any}
+                      onChange={async (event: any, newValue: any | null) => {
+                        setFieldValue("ruleType", newValue);
+                        if (!newValue) {
+                          setFieldValue("ruleId", "");
+                          setRuleIds([]);
+                          // reset the mapping as well
+                        } else {
+                          const ruleIdsForType = await getRuleIdsForRuleType(
+                            newValue.id
+                          );
+                          setRuleIds(ruleIdsForType);
+                          // trigger a GET call and get all ruleIds for this type /ruleIds?ruleType=<string> API
+                        }
+                      }}
+                      options={ruleTypes || []} // fetched asynchronously; maybe elastic search
+                      getOptionLabel={({
+                        id,
+                        name,
+                      }: {
+                        id: string;
+                        name: string;
+                      }) => `${id} : ${name}`}
+                      renderInput={(params: any) => (
+                        <TextField
+                          {...params}
+                          required
+                          label="Rule Type"
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                        />
+                      )}
                     />
-                  )}
-                  <Autocomplete
-                    fullWidth
-                    value={values.ruleType as any}
-                    onChange={(event: any, newValue: any | null) => {
-                      setFieldValue("ruleType", newValue);
-                      if (!newValue) {
+                    <Autocomplete
+                      fullWidth
+                      value={values.ruleId as any}
+                      onChange={async (event: any, newValue: any | null) => {
                         setFieldValue("ruleId", newValue);
-                        // reset the mapping as well
-                      } else {
-                        // trigger a GET call and get all ruleIds for this type /ruleIds?ruleType=<string> API
-                      }
-                    }}
-                    options={RuleTypes} // fetched asynchronously; maybe elastic search
-                    getOptionLabel={({
-                      id,
-                      name,
-                    }: {
-                      id: string;
-                      name: string;
-                    }) => `${id} : ${name}`}
-                    renderInput={(params: any) => (
-                      <TextField
-                        {...params}
-                        required
-                        label="Rule Type"
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                      />
-                    )}
-                  />
-                  <Autocomplete
-                    fullWidth
-                    value={values.ruleId as any}
-                    onChange={(event: any, newValue: any | null) => {
-                      setFieldValue("ruleId", newValue);
-                      // trigger a GET call and get the rule for this ruleId /rule?ruleId=<string> API
-                      // setFieldValue("mapping", the array returned);
-                    }}
-                    options={MockRuleIds} // fetched asynchronously;
-                    renderInput={(params: any) => (
-                      <TextField
-                        {...params}
-                        required
-                        label="Rule Id"
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                      />
-                    )}
-                    disabled={!values.ruleType}
-                  />
-                  {getFieldProps("ruleId").value && values.mapping?.length && (
-                    <RuleMapper formikProps={formikProps} />
-                  )}
-                  <Box>
-                    <Button
-                      color="primary"
-                      type="submit"
-                      disabled={isSubmitting}
-                    >
-                      Submit
-                    </Button>
-                  </Box>
-                </DialogContent>
-              </Form>
-            );
-          }}
-        </Formik>
+                        const ruleModel = await getRuleModelForRuleId(newValue);
+                        console.log(ruleModel);
+                        const mapping = ruleModel.attributes.map(
+                          ({ name }: any) => ({ attributeName: name })
+                        );
+                        // trigger a GET call and get the rule for this ruleId /rule?ruleId=<string> API
+                        setFieldValue("mapping", mapping);
+                      }}
+                      options={ruleIds} // fetched asynchronously;
+                      renderInput={(params: any) => (
+                        <TextField
+                          {...params}
+                          required
+                          label="Rule Id"
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                        />
+                      )}
+                      disabled={!values.ruleType && ruleIds.length === 0}
+                    />
+                    {getFieldProps("ruleId").value &&
+                      values.mapping?.length && (
+                        <RuleMapper formikProps={formikProps} />
+                      )}
+                    <Box>
+                      <Button
+                        color="primary"
+                        type="submit"
+                        disabled={isSubmitting}
+                      >
+                        Submit
+                      </Button>
+                    </Box>
+                  </DialogContent>
+                </Form>
+              );
+            }}
+          </Formik>
+        )}
       </Dialog>
     </>
   );

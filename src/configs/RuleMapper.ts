@@ -29,22 +29,23 @@ export const BusinessRuleMapperInitialValues: BusinessRuleMapper = {
   ruleId: null,
   // rule attributes for this rule ID is fetched and 'mapping' object must be built
   // dummy values for now to simulate a fetch
-  mapping: [
-    {
-      attributeName: "abc",
-    },
-    {
-      attributeName: "testFunc",
-      type: "function",
-      functionName: "translFunc",
-      functionArgs: ["val1", "val2"],
-    },
-    {
-      attributeName: "testVal",
-      type: "value",
-      mappedTo: "val3",
-    },
-  ],
+  mapping: [],
+  // mapping: [
+  //   {
+  //     attributeName: "abc",
+  //   },
+  //   {
+  //     attributeName: "testFunc",
+  //     type: "function",
+  //     functionName: "translFunc",
+  //     functionArgs: ["val1", "val2"],
+  //   },
+  //   {
+  //     attributeName: "testVal",
+  //     type: "value",
+  //     mappedTo: "val3",
+  //   },
+  // ],
 };
 
 export const RuleMapperValidationSchema = yup.object().shape({
