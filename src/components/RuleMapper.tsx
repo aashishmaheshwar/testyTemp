@@ -115,9 +115,13 @@ const RuleMapper = ({ formikProps, options }: RuleMapperProps) => {
                           {...getFieldProps(mappedTo)}
                           onInputChange={(e, value) => {
                             setFieldValue(mappedTo, value);
+                            setFieldValue(functionName, undefined);
+                            setFieldValue(functionArgs, undefined);
                           }}
                           onChange={(e, value) => {
                             setFieldValue(mappedTo, value || "");
+                            setFieldValue(functionName, undefined);
+                            setFieldValue(functionArgs, undefined);
                           }}
                           renderInput={(params) => (
                             <TextField
