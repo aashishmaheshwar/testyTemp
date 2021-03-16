@@ -110,6 +110,7 @@ const BusinessRules = () => {
         <BusinessRuleMapper
           open={!!selectedBusinessEventRule}
           event={selectedBusinessEventRule}
+          businessEventId={businessEventId}
           onClose={() => {
             setSelectedBusinessEventRule(null);
           }}
@@ -119,6 +120,7 @@ const BusinessRules = () => {
         <BusinessRuleMapper
           isNew
           open
+          businessEventId={businessEventId}
           onClose={() => {
             setOpen(false);
           }}

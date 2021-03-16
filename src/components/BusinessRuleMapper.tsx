@@ -36,7 +36,7 @@ export const createBusinessEventRule = async (body: any) => {
 };
 
 export const updateBusinessEventRule = async (body: any) => {
-  const { data } = await axios.post(
+  const { data } = await axios.put(
     `${env.apiHostName}/${env.apis.updateBusinessEventRule}`,
     body
   );
@@ -66,6 +66,7 @@ type BusinessRuleProps = {
   isNew?: boolean;
   open?: boolean;
   event?: any;
+  businessEventId: string | null;
   onClose: any;
 };
 
@@ -74,6 +75,7 @@ const BusinessRuleMapper = ({
   open = false,
   event,
   onClose,
+  businessEventId,
 }: BusinessRuleProps) => {
   const [alertMsg, setAlertMsg] = useState("");
   const [ruleIds, setRuleIds] = useState([]);
@@ -177,6 +179,7 @@ const BusinessRuleMapper = ({
               //   postData.attributes = postData.attributes.map(
               //     ({ id, ...rest }: any) => rest
               //   );
+              postData.businessEventId = businessEventId;
               alert(JSON.stringify(postData, null, 2));
               if (isNew) {
                 businessEventMutation.mutate(postData);
